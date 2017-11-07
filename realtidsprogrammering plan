@@ -20,20 +20,25 @@ updateMode:
 waits for data packet from the client to set the mode in the cameraMonitor.
 
 
+motionSensor:
+
+a thread called from the client in order to check for motion, sends back motion data to client via http.
+
+
+Monitors:
+
 cameraMonitor:
 
 methods for setMode, getImage and putImage. All these methods should be synchronized.
 the sendPicture thread might not be notified until buffer is full during movie mode to promote efficiency.
 
 
-motionSensor:
-
-a thread called from the client in order to check for motion, sends back motion data to client via http.
 
 
 
 Client:
 
+Threads:
 
 MotionCtrl:
 Periodically checks the MotionSensor thread and receives motion data in return. Updates mode in the ClientMonitor.
@@ -51,6 +56,8 @@ There are two Display threads, one for each camera. Getting pictures from there 
 
 Input:
 sets mode regardless of motion in cameras.
+
+Monitors:
 
 ClientMonitor:
 holds methods for setting and getting mode, and a buffer for each camera storing pictures.
@@ -92,8 +99,8 @@ Packets:
 
 Picture packet:
 
-Time stamp      no of bits: TBD
-size            no of bits: TBD
+Time stamp      no of bits: 32
+size            no of bits: 2Log(24 x [Resolution])
 data            no of bits: determined by size
 
 
