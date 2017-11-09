@@ -195,35 +195,35 @@
 
 \textbf{Threads:}\\
 
-\textit{takePicture:}
+\textit{TakePicture:}
 
-has access to the camera monitor and uses mode to determine frequency of picture taking.
-Stores the images in a buffer in the monitor.
-Holds a variable (static?) which determines the wait time between images in idle mode.\\
+Waits for picSent to be true. Then sets picSent to false. takePicture har access to the camera monitor and uses mode to determine frequency of picture taking.
+Stores the image in a variable in the camera monitor.
+Holds a variable which determines the wait time between images in idle mode. when done, sets picTaken to true.\\
 
 
-\textit{sendPicture:}
+\textit{SendPicture:}
 
-accesses picture buffer in monitor, wraps in package for sending over network, and sends.
+Waits for picTaken to be true. Then sets picTaken to false. Accesses the picture attribute in the camera monitor, wraps in package for sending over network, and sends. Sets picSent to true and notifies takePicture.
 No logic concerning mode, sends asap.\\
 
 
-\textit{updateMode:}
+\textit{UpdateMode:}
 
-waits for data packet from the client to set the mode in the cameraMonitor.\\
+Waits for data packet from the client to set the mode in the cameraMonitor.\\
 
 
-\textit{motionSensor:}
+\textit{MotionSensor:}
 
-a thread called from the client in order to check for motion, sends back motion data to client via http.\\\\
+A thread called from the client in order to check for motion, sends back motion data to client via http.\\\\
 
 
 \textbf{Monitors:}\\
 
-\textit{cameraMonitor:}
+\textit{CameraMonitor:}
 
-methods for setMode, getImage and putImage. All these methods should be synchronized.
-the sendPicture thread might not be notified until buffer is full during movie mode to promote efficiency.\\\\
+Methods for setMode, getImage and putImage. All these methods should be synchronized. Holds private booleans takePic and picTaken which are also accessed via synchronized methods. They are used by TakePicture(), sendPicture() to determine when to take and send pictures respectively.
+.\\\\
 
 
 
@@ -237,26 +237,26 @@ the sendPicture thread might not be notified until buffer is full during movie m
 Periodically checks the MotionSensor thread and receives motion data in return. Updates mode in the ClientMonitor.\\
 
 \textit{SendMode:}
-waits for update of mode in ClientMonitor and sends to UpdateMode thread in camera.\\
+Waits for update of mode in ClientMonitor and sends to UpdateMode thread in camera.\\
 
 \textit{PictureReceiver:}
-waits for new picture from sedPicture thread in camera. Stores pictures from both cameras in a common buffer, in the ClientMonitor.\\
+Waits for new picture from sedPicture thread in camera. Stores pictures from both cameras in a common buffer, in the ClientMonitor.\\
 
 \textit{Display:}
-periodically updates the DisplayMonitor depending on the frequency of received pictures. Does not consider mode per se, instead uses time stamps of pictures to determine synchronous or asynchronous mode.
-There are two Display threads, one for each camera. Getting pictures from there respective buffers. While in synchronous mode sleeps the required time. While in asynchronous mode, does not sleep, sends to DisplayMonitor immediately. The display thread notifies the GUI that a new picture is available.\\
+Periodically updates the DisplayMonitor depending on the frequency of received pictures. Does not consider mode per se, instead uses time stamps of pictures to determine synchronous or asynchronous mode.
+There are two Display threads, one for each camera. Getting pictures from there respective buffers. While in synchronous mode sleeps the required time. While in asynchronous mode, does not sleep. Regardless of mode constant switching is prevented by a counter which allows for multiple frames in a row which do not conform to the current mode (sync/async). Sends to DisplayMonitor immediately. The display thread notifies the GUI that a new picture is available.\\
 
 
 \textit{Input:}
-sets mode regardless of motion in cameras.\\\\
+Sets mode regardless of motion in cameras.\\\\
 
 \textbf{Monitors:}\\
 
 \textit{ClientMonitor:}
-holds methods for setting and getting mode, and a buffer for each camera storing pictures.\\
+Holds methods for setting and getting mode, and a buffer for each camera storing pictures. The mode of the ClientMonitor propagates accross the system e.g. determines mode for the cameras.\\
 
 \textit{DisplayMonitor:}
-holds references to two pictures, one for each camera. Updated by the two display threads. Read by the GUI thread. The methods for access are synchronized. These images are shown in the GUI.\\
+Holds references to two pictures, one for each camera. Updated by the two display threads. Read by the GUI thread. The methods for access are synchronized. These images are shown in the GUI.\\
 
 \textit{GUI:}
 
@@ -266,7 +266,7 @@ the GUI.\\\\
 
 \textbf{From picture to display - data flow:}
 
-picture is taken in the TakePicture thread.
+Picture is taken in the TakePicture thread.
 Picture is stored in the buffer of the CameraMonitor - notify
 SendPicture is notified and packs the picture with data (camera, timestamp, image size, image data) and sends via TCP
 PictureReceiver waits for picture from SendPicture. Gets image, saves in buffer in ClientMonitor.
@@ -290,7 +290,7 @@ UpdateMode updates mode in the CameraMonitor.\\\\\\
 
 \textit{Picture packet:}
 
-Time stamp\tab no of bits: 32\\
+Time stamp\tab no of bits: 64\\
 size\tab no of bits: 2Log(24 x [Resolution])\\
 data\tab no of bits: determined by size
 \\
