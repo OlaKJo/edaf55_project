@@ -272,7 +272,7 @@ SendPicture is notified and packs the picture with data (camera, timestamp, imag
 PictureReceiver waits for picture from SendPicture. Gets image, saves in buffer in ClientMonitor.
 Display thread takes from the picture buffer ASAP. Depending on camera and frequency the pictures are displayed in different ways.\\
 
-\textbf{updating mode - data flow:}
+\textbf{Updating mode - data flow:}
 
 Periodically the MotionsCtrl thread requests info from MotionSensor thread via http, which informs the system of motion.
 MotionCtrl sets mode in ClientMonitor, notify.
@@ -315,7 +315,7 @@ existing protocol.
 \begin{figure}
   \caption{UML diagram of proposed design.}
   \center
-\includegraphics[width=0.75\columnwidth, angle=90]{UML.png}
+\includegraphics[width=0.75\columnwidth, angle=90]{UML2.png}
 \end{figure}
 
 %\end{center}
@@ -325,3 +325,4 @@ existing protocol.
 \end{homeworkProblem}
 
 \end{document}\grid
+\grid

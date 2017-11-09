@@ -1,11 +1,11 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.8.23)  9 NOV 2017 13:57
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.9.3)  9 NOV 2017 14:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **camera_project_design_draft_v1.tex
 (./camera_project_design_draft_v1.tex
 LaTeX2e <2016/02/01>
-Babel <3.9q> and hyphenation patterns for 29 language(s) loaded.
+Babel <3.9q> and hyphenation patterns for 81 language(s) loaded.
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
 (/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
@@ -378,10 +378,10 @@ Underfull \hbox (badness 10000) in paragraph at lines 309--311
 
  []
 
-<UML.png, id=14, 598.3956pt x 845.0772pt>
-File: UML.png Graphic file (type png)
- <use UML.png>
-Package pdftex.def Info: UML.png used on input line 318.
+<UML2.png, id=14, 598.3956pt x 845.0772pt>
+File: UML2.png Graphic file (type png)
+ <use UML2.png>
+Package pdftex.def Info: UML2.png used on input line 318.
 (pdftex.def)             Requested size: 352.31624pt x 497.55965pt.
 
 Overfull \hbox (27.80466pt too wide) in paragraph at lines 318--319
@@ -390,22 +390,22 @@ Overfull \hbox (27.80466pt too wide) in paragraph at lines 318--319
 
 
 AED: lastpage setting LastPage
-[3] [4 <./UML.png>] (./camera_project_design_draft_v1.aux) ) 
+[3] [4 <./UML2.png>] (./camera_project_design_draft_v1.aux) ) 
 Here is how much of TeX's memory you used:
- 3426 strings out of 494374
- 49686 string characters out of 6164954
- 228805 words of memory out of 5000000
- 6706 multiletter control sequences out of 15000+600000
+ 3426 strings out of 493029
+ 49691 string characters out of 6136235
+ 232299 words of memory out of 5000000
+ 6921 multiletter control sequences out of 15000+600000
  9194 words of font info for 32 fonts, out of 8000000 for 9000
- 350 hyphenation exceptions out of 8191
+ 1141 hyphenation exceptions out of 8191
  38i,11n,43p,501b,301s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf
--dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/
-fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/t
-ype1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/pub
-lic/amsfonts/cm/cmti10.pfb>
-Output written on camera_project_design_draft_v1.pdf (4 pages, 293519 bytes).
+</usr/share/texliv
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/pu
+blic/amsfonts/cm/cmti10.pfb>
+Output written on camera_project_design_draft_v1.pdf (4 pages, 312420 bytes).
 PDF statistics:
  38 PDF objects out of 1000 (max. 8388607)
  25 compressed objects within 1 object stream
