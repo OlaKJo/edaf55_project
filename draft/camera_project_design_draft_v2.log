@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.9.3)  9 NOV 2017 14:14
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.9.3)  9 NOV 2017 14:16
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**camera_project_design_draft_v1.tex
-(./camera_project_design_draft_v1.tex
+**camera_project_design_draft_v2.tex
+(./camera_project_design_draft_v2.tex
 LaTeX2e <2016/02/01>
 Babel <3.9q> and hyphenation patterns for 81 language(s) loaded.
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
@@ -124,8 +124,8 @@ File: lstlang1.sty 2015/06/04 1.6 listings language file
 )
 \c@homeworkProblemCounter=\count97
 
-(./camera_project_design_draft_v1.aux)
-\openout1 = `camera_project_design_draft_v1.aux'.
+No file camera_project_design_draft_v2.aux.
+\openout1 = `camera_project_design_draft_v2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 173.
 LaTeX Font Info:    ... okay on input line 173.
@@ -142,7 +142,6 @@ LaTeX Font Info:    ... okay on input line 173.
 Package lastpage Info: Please have a look at the pageslts package at
 (lastpage)             https://www.ctan.org/pkg/pageslts
 (lastpage)             ! on input line 173.
-
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count98
@@ -294,6 +293,9 @@ Underfull \hbox (badness 10000) in paragraph at lines 245--248
 
  []
 
+
+LaTeX Warning: Reference `LastPage' on page 2 undefined on input line 248.
+
 [2]
 Underfull \hbox (badness 10000) in paragraph at lines 250--252
 
@@ -389,23 +391,39 @@ Overfull \hbox (27.80466pt too wide) in paragraph at lines 318--319
  []
 
 
+Package lastpage Warning: Rerun to get the references right on input line 327.
+
+
 AED: lastpage setting LastPage
-[3] [4 <./UML2.png>] (./camera_project_design_draft_v1.aux) ) 
+
+LaTeX Warning: Reference `LastPage' on page 3 undefined on input line 327.
+
+[3]
+
+LaTeX Warning: Reference `LastPage' on page 4 undefined on input line 327.
+
+[4 <./UML2.png>] (./camera_project_design_draft_v2.aux)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ ) 
 Here is how much of TeX's memory you used:
- 3426 strings out of 493029
- 49691 string characters out of 6136235
+ 3424 strings out of 493029
+ 49621 string characters out of 6136235
  232299 words of memory out of 5000000
  6921 multiletter control sequences out of 15000+600000
  9194 words of font info for 32 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  38i,11n,43p,501b,301s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texliv
-e/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/
-type1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/pu
-blic/amsfonts/cm/cmti10.pfb>
-Output written on camera_project_design_draft_v1.pdf (4 pages, 312420 bytes).
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
+r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
+e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texli
+ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb>
+Output written on camera_project_design_draft_v2.pdf (4 pages, 312682 bytes).
 PDF statistics:
  38 PDF objects out of 1000 (max. 8388607)
  25 compressed objects within 1 object stream
