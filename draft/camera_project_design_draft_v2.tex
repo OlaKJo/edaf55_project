@@ -240,7 +240,9 @@ Periodically checks the MotionSensor thread and receives motion data in return. 
 Waits for update of mode in ClientMonitor and sends to UpdateMode thread in camera.\\
 
 \textit{PictureReceiver:}
-Waits for new picture from sedPicture thread in camera. Stores pictures from both cameras in a common buffer, in the ClientMonitor.\\
+Waits for new picture from sedPicture thread in camera. Stores pictures from both cameras in a common buffer, in the ClientMonitor. 
+
+%(tid bild visas) - (tid för bild) < 0.2s \\
 
 \textit{Display:}
 Periodically updates the DisplayMonitor depending on the frequency of received pictures. Does not consider mode per se, instead uses time stamps of pictures to determine synchronous or asynchronous mode.
@@ -253,7 +255,7 @@ Sets mode regardless of motion in cameras.\\\\
 \textbf{Monitors:}\\
 
 \textit{ClientMonitor:}
-Holds methods for setting and getting mode, and a buffer for each camera storing pictures. The mode of the ClientMonitor propagates accross the system e.g. determines mode for the cameras.\\
+Holds methods for setting and getting mode, and a buffer for each camera storing pictures. The mode of the ClientMonitor propagates accross the system e.g. determines mode for the cameras. Saves the timestamp of the latest received image in a variable. Uses this time to compare with the next received image, and then updates its latest time to this image. If the time between the images timestamps is less than 0.2s, then the sync boolean in ClientMonitor is set to true. If the time difference is greater than 0.2s, the sync boolean is set to false. To avoid switching from sync to async there is a counter which allows for multiple frames which do not conform to the current mode without switching.\\
 
 \textit{DisplayMonitor:}
 Holds references to two pictures, one for each camera. Updated by the two display threads. Read by the GUI thread. The methods for access are synchronized. These images are shown in the GUI.\\

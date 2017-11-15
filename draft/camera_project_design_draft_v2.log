@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.9.3)  9 NOV 2017 14:16
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.9.3)  15 NOV 2017 10:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -124,7 +124,7 @@ File: lstlang1.sty 2015/06/04 1.6 listings language file
 )
 \c@homeworkProblemCounter=\count97
 
-No file camera_project_design_draft_v2.aux.
+(./camera_project_design_draft_v2.aux)
 \openout1 = `camera_project_design_draft_v2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 173.
@@ -142,6 +142,7 @@ LaTeX Font Info:    ... okay on input line 173.
 Package lastpage Info: Please have a look at the pageslts package at
 (lastpage)             https://www.ctan.org/pkg/pageslts
 (lastpage)             ! on input line 173.
+
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count98
@@ -284,50 +285,32 @@ Underfull \hbox (badness 10000) in paragraph at lines 239--241
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 242--244
+Underfull \hbox (badness 10000) in paragraph at lines 247--250
 
  []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 245--248
-
- []
-
-
-LaTeX Warning: Reference `LastPage' on page 2 undefined on input line 248.
 
 [2]
-Underfull \hbox (badness 10000) in paragraph at lines 250--252
+Underfull \hbox (badness 10000) in paragraph at lines 252--254
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 250--252
+Underfull \hbox (badness 10000) in paragraph at lines 252--254
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 253--254
+Underfull \hbox (badness 10000) in paragraph at lines 255--256
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 255--257
+Underfull \hbox (badness 10000) in paragraph at lines 257--259
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 258--260
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 263--264
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 263--264
+Underfull \hbox (badness 10000) in paragraph at lines 260--262
 
  []
 
@@ -337,93 +320,87 @@ Underfull \hbox (badness 10000) in paragraph at lines 265--266
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 269--274
+Underfull \hbox (badness 10000) in paragraph at lines 265--266
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 277--281
+Underfull \hbox (badness 10000) in paragraph at lines 267--268
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 277--281
+Underfull \hbox (badness 10000) in paragraph at lines 271--276
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 277--281
+Underfull \hbox (badness 10000) in paragraph at lines 279--283
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 289--290
+Underfull \hbox (badness 10000) in paragraph at lines 279--283
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 279--283
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 291--292
 
  []
 
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 293.
+(Font)              <7> on input line 295.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 293.
+(Font)              <5> on input line 295.
 
-Underfull \hbox (badness 10000) in paragraph at lines 295--297
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 303--305
+Underfull \hbox (badness 10000) in paragraph at lines 297--299
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 309--311
+Underfull \hbox (badness 10000) in paragraph at lines 305--307
 
  []
 
-<UML2.png, id=14, 598.3956pt x 845.0772pt>
+[3]
+Underfull \hbox (badness 10000) in paragraph at lines 311--313
+
+ []
+
+<UML2.png, id=17, 598.3956pt x 845.0772pt>
 File: UML2.png Graphic file (type png)
  <use UML2.png>
-Package pdftex.def Info: UML2.png used on input line 318.
+Package pdftex.def Info: UML2.png used on input line 320.
 (pdftex.def)             Requested size: 352.31624pt x 497.55965pt.
 
-Overfull \hbox (27.80466pt too wide) in paragraph at lines 318--319
+Overfull \hbox (27.80466pt too wide) in paragraph at lines 320--321
  [] 
  []
 
 
-Package lastpage Warning: Rerun to get the references right on input line 327.
-
-
 AED: lastpage setting LastPage
-
-LaTeX Warning: Reference `LastPage' on page 3 undefined on input line 327.
-
-[3]
-
-LaTeX Warning: Reference `LastPage' on page 4 undefined on input line 327.
-
-[4 <./UML2.png>] (./camera_project_design_draft_v2.aux)
-
-LaTeX Warning: There were undefined references.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
- ) 
+[4 <./UML2.png>] (./camera_project_design_draft_v2.aux) ) 
 Here is how much of TeX's memory you used:
- 3424 strings out of 493029
- 49621 string characters out of 6136235
+ 3426 strings out of 493029
+ 49691 string characters out of 6136235
  232299 words of memory out of 5000000
  6921 multiletter control sequences out of 15000+600000
  9194 words of font info for 32 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 38i,11n,43p,501b,301s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
-e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texli
-ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf
--dist/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on camera_project_design_draft_v2.pdf (4 pages, 312682 bytes).
+ 38i,12n,43p,740b,301s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texlive/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmti10.pfb>
+Output written on camera_project_design_draft_v2.pdf (4 pages, 312903 bytes).
 PDF statistics:
  38 PDF objects out of 1000 (max. 8388607)
  25 compressed objects within 1 object stream
