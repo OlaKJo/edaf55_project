@@ -8,9 +8,10 @@
 
 int main(){
     int clientSocket;
-    char buffer[1024];
+    char buffer[1];
     struct sockaddr_in serverAddr;
     socklen_t addr_size;
+    int i = 0;
 
     /*---- Create the socket. The three arguments are: ----*/
     /* 1) Internet domain 2) Stream socket 3) Default protocol (TCP in this case) */
@@ -20,7 +21,8 @@ int main(){
     /* Address family = Internet */
     serverAddr.sin_family = AF_INET;
     /* Set port number, using htons function to use proper byte order */
-    serverAddr.sin_port = htons(7891);
+    //serverAddr.sin_port = htons(7891);
+    serverAddr.sin_port = htons(22222);
     /* Set IP address to localhost */
     serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
     /* Set all bits of the padding field to 0 */
@@ -30,13 +32,13 @@ int main(){
     addr_size = sizeof serverAddr;
     connect(clientSocket, (struct sockaddr *) &serverAddr, addr_size);
 
-    while(1)
+    while(i++ < 100)
     {
         /*---- Read the message from the server into the buffer ----*/
-        recv(clientSocket, buffer, 1024, 0);
+        recv(clientSocket, buffer, 1, 0);
 
         /*---- Print the received message ----*/
-        printf("Data received: %s",buffer);
+        printf("Data received: %s\n",buffer);
     }
 
     return 0;

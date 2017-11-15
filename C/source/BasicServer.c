@@ -7,12 +7,16 @@
 #include <arpa/inet.h>
 
 
+int send_all(int socket, const void *buffer, size_t length, int flags);
+
 int main(){
     int welcomeSocket, newSocket;
-    char buffer[1024];
+    char buffer[1];
     struct sockaddr_in serverAddr;
     struct sockaddr_storage serverStorage;
     socklen_t addr_size;
+    int i = 1;
+    int * j;
 
     /*---- Create the socket. The three arguments are: ----*/
     /* 1) Internet domain 2) Stream socket 3) Default protocol (TCP in this case) */
@@ -22,9 +26,11 @@ int main(){
     /* Address family = Internet */
     serverAddr.sin_family = AF_INET;
     /* Set port number, using htons function to use proper byte order */
-    serverAddr.sin_port = htons(7891);
+    //serverAddr.sin_port = htons(7891);
+    serverAddr.sin_port = htons(22222);
     /* Set IP address to localhost */
-    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    //serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serverAddr.sin_addr.s_addr = inet_addr("10.2.205.202");
     /* Set all bits of the padding field to 0 */
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
 
@@ -42,11 +48,29 @@ int main(){
     newSocket = accept(welcomeSocket, (struct sockaddr *) &serverStorage, &addr_size);
 
     /*---- Send message to the socket of the incoming connection ----*/
+
     while(1)
     {
-        strcpy(buffer,"Hello World\n");
-        send(newSocket,buffer,13,0);
+        buffer[0] = 0x21;
+        //strcpy(buffer,j);
+        //send(newSocket,buffer,13,0);
+        send_all(newSocket, buffer, 2, 0);
     }
 
+    return 0;
+}
+
+int send_all(int socket, const void *buffer, size_t length, int flags)
+{
+    ssize_t n;
+    const char *p = buffer;
+    while (length > 0)
+    {
+        n = send(socket, p, length, flags);
+        if (n <= 0)
+        return -1;
+        p += n;
+        length -= n;
+    }
     return 0;
 }
