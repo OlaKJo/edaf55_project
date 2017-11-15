@@ -7,7 +7,6 @@ import networking.*;
 
 public class PictureReciever extends Thread {
 
-	private int[] image;
 	ClientMonitor monitr;
 	
 	private NetMonitor netMonitor;
