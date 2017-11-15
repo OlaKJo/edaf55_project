@@ -3,10 +3,7 @@ package Client;
 import java.io.IOException;
 import java.io.InputStream;
 
-import networking.NetMonitor;
-import networkingexample.ClientSharedData;
-import networkingexample.Pack;
-import networkingexample.Utils;
+import networking.*;
 
 public class PictureReciever extends Thread {
 
@@ -41,16 +38,6 @@ public class PictureReciever extends Thread {
 					}
 					if (size != 0) break;
 					
-					// Read payload
-					int bufsize = size = Pack.unpackHeaderSize(buffer);
-					n = 0;
-					while ((n = is.read(buffer, n+Pack.HEAD_SIZE, size)) > 0) {
-						size -= n;
-					}
-					if (size != 0) break;
-					
-					// Unpack payload and verify integrity
-					Utils.printBuffer("ClientReadThread", bufsize, buffer);
 					Pack.unpackPayloadAndVerifyChecksum(buffer);
 				}
 			} catch (IOException e) {
@@ -59,7 +46,7 @@ public class PictureReciever extends Thread {
 				// Example: the connection is closed on the server side, but
 				// the client is still trying to write data.
 				netMonitor.setActive(false);
-				Utils.println("No connection on client side");
+				System.out.println("No connection on client side");
 			} catch (InterruptedException e) {
 				// Occurs when interrupted
 				netMonitor.shutdown();
@@ -69,7 +56,7 @@ public class PictureReciever extends Thread {
 		
 		// No resources to dispose since this is the responsibility
 		// of the shutdown thread.
-		Utils.println("Exiting ClientReadThread");
+		System.out.println("Exiting ClientReadThread");
 	}
 	
 }
