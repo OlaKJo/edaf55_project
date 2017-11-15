@@ -37,7 +37,7 @@ public class ClientMonitor {
 
 	}
 
-	public void putPicture1(int[] pic) {
+	public synchronized void putPicture1(int[] pic) {
 		picBuffer1 = pic;
 		displayCam1.putImage(pic);
 		notifyAll();
@@ -45,7 +45,7 @@ public class ClientMonitor {
 			pictureDelayCheck();
 	}
 	
-	public void putPicture2(int[] pic) {
+	public synchronized void putPicture2(int[] pic) {
 		picBuffer2 = pic;
 		displayCam2.putImage(pic);
 		notifyAll();
