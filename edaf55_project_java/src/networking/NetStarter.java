@@ -11,7 +11,7 @@ public class NetStarter {
 				NetMonitor monitor = new NetMonitor();
 				Thread[] threads = new Thread[] {
 					new PictureReciever(monitor),
-					new ClientConnectionThread(monitor, "10.2.228.211", 22222),
+					new ClientConnectionThread(monitor, "127.0.0.1", 22222),
 					new ClientShutdownThread(monitor)
 				};
 				

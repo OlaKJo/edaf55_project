@@ -29,8 +29,8 @@ int main(){
     //serverAddr.sin_port = htons(7891);
     serverAddr.sin_port = htons(22222);
     /* Set IP address to localhost */
-    //serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    serverAddr.sin_addr.s_addr = inet_addr("10.2.205.202");
+    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    //serverAddr.sin_addr.s_addr = inet_addr("10.2.205.202");
     /* Set all bits of the padding field to 0 */
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
 
@@ -54,7 +54,7 @@ int main(){
         buffer[0] = 0x21;
         //strcpy(buffer,j);
         //send(newSocket,buffer,13,0);
-        send_all(newSocket, buffer, 2, 0);
+        send_all(newSocket, buffer, 1, 0);
     }
 
     return 0;
