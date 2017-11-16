@@ -2,6 +2,7 @@ package networkingexample;
 
 import java.io.IOException;
 import java.io.InputStream;
+import se.lth.cs.eda040.fakecamera.AxisM3006V;
 
 // This thread has the double responsibility of connecting 
 // and reading data from the socket
@@ -12,7 +13,7 @@ public class ClientReadThread extends Thread {
 	
 	public ClientReadThread(ClientSharedData mon) {
 		monitor = mon;
-		buffer = new byte[8192];
+		buffer = new byte[AxisM3006V.IMAGE_BUFFER_SIZE];
 	}
 	
 	// Receive packages of random size from active connections.

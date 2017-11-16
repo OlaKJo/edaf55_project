@@ -3,6 +3,8 @@ package networking;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import se.lth.cs.eda040.fakecamera.AxisM3006V;
+
 
 // This thread has the double responsibility of connecting 
 // and reading data from the socket

@@ -29,7 +29,7 @@ public class ClientWriteThread extends Thread {
 				// Send data packages of different sizes
 				while (true) {
 					int size = Pack.pack(buffer);
-					Utils.printBuffer("ClientWriteThread", size, buffer);
+					//Utils.printBuffer("ClientWriteThread", size, buffer);
 
 					// Send package
 					os.write(buffer, 0, size);

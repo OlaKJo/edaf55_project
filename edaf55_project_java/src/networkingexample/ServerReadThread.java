@@ -43,7 +43,7 @@ public class ServerReadThread extends Thread {
 					if (size != 0) break;
 					
 					// Unpack payload and verify integrity
-					Utils.printBuffer("ServerReadThread", payloadSize, buffer);
+					//Utils.printBuffer("ServerReadThread", payloadSize, buffer);
 					Pack.unpackPayloadAndVerifyChecksum(buffer);
 				}
 			} catch (IOException e) {
