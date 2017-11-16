@@ -13,7 +13,7 @@ public class ServerWriteThread extends Thread {
 
 	public ServerWriteThread(ServerSharedData mon) {
 		monitor = mon;
-		buffer = new byte[AxisM3006V.IMAGE_BUFFER_SIZE];
+		buffer = new byte[AxisM3006V.IMAGE_BUFFER_SIZE + Pack.HEAD_SIZE];
 		cam.init();
 	    cam.connect();
 	}
@@ -30,7 +30,8 @@ public class ServerWriteThread extends Thread {
 
 				// Send data packages of different sizes
 				while (true) {
-					int size = cam.getJPEG(buffer, 0);
+					int size = cam.getJPEG(buffer, 11);
+					createHeader(buffer, size);
 					//int size = Pack.pack(buffer);
 					Utils.printBuffer("ServerWriteThread", size, buffer);
 
@@ -58,6 +59,23 @@ public class ServerWriteThread extends Thread {
 		}
 
 		Utils.println("Exiting ServerWriteThread");
+	}
+
+	private void createHeader(byte[] buffer, int size) {
+		//sets timestamp to 0 for now
+		for (int i = 0; i < 8; i++) {
+			buffer[i] = 0;
+		}	
+		
+		byte hi = (byte)((size & 0xff0000) >>> 16);
+		byte mid = (byte)((size & 0xff00) >>> 8);
+		byte lo = (byte)(size & 0xff);
+		
+		// Set header to buffer
+		buffer[8] = hi;
+		buffer[9] = mid;
+		buffer[10] = lo;
+		
 	}
 }
 

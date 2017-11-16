@@ -13,7 +13,7 @@ public class ClientReadThread extends Thread {
 	
 	public ClientReadThread(ClientSharedData mon) {
 		monitor = mon;
-		buffer = new byte[AxisM3006V.IMAGE_BUFFER_SIZE];
+		buffer = new byte[AxisM3006V.IMAGE_BUFFER_SIZE + Pack.HEAD_SIZE];
 	}
 	
 	// Receive packages of random size from active connections.
@@ -40,12 +40,13 @@ public class ClientReadThread extends Thread {
 					int bufsize = size = Pack.unpackHeaderSize(buffer);
 					n = 0;
 					while ((n = is.read(buffer, n+Pack.HEAD_SIZE, size)) > 0) {
+						System.out.println("size: " + size);
 						size -= n;
 					}
 					if (size != 0) break;
 					
 					// Unpack payload and verify integrity
-					Utils.printBuffer("ClientReadThread", bufsize, buffer);
+//					Utils.printBuffer("ClientReadThread", bufsize, buffer);
 					Pack.unpackPayloadAndVerifyChecksum(buffer);
 				}
 			} catch (IOException e) {

@@ -1,7 +1,7 @@
 package networkingexample;
 
 public class Pack {
-	public static final int HEAD_SIZE = 3;
+	public static final int HEAD_SIZE = 11;
 	
 	// Pack data into byte array buffer
 	// Return number of bytes to send
@@ -33,9 +33,10 @@ public class Pack {
 	// Unpacking is done in two stages. First the header ...
 	// Return number of bytes to read
 	public static int unpackHeaderSize(byte[] buffer) {
-		int hi = (buffer[0] & 0xff) << 8;
-		int lo = buffer[1] & 0xff;
-		int size = hi | lo;
+		int hi = buffer[8] << 16;
+		int mid = buffer[9] << 8;
+		int lo = buffer[10];
+		int size = hi | mid | lo;
 		return size;
 	}
 	
