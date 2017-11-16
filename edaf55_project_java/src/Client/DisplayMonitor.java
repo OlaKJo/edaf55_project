@@ -2,47 +2,28 @@ package Client;
 
 public class DisplayMonitor {
 
-	private int[] pic_1, pic_2;
-	// flags for pics received and available to fetch
-	private boolean pic1Available, pic2Available;
+	private byte[] pic_1, pic_2;
+	private SwingGui gui;
+	private long timeStampPic1, timeStampPic2;
 
-	public DisplayMonitor() {
-		pic1Available = false;
-		pic2Available = false;
+	public DisplayMonitor(SwingGui gui) {
+		this.gui = gui;
+		timeStampPic1 = System.currentTimeMillis();
+		timeStampPic2 = System.currentTimeMillis();
 	}
 
-	public synchronized void updatePicture1(int[] pic) {
+	public synchronized void updatePicture1(byte[] pic) {
+		long arrivalTime = System.currentTimeMillis();
 		this.pic_1 = pic;
-		pic1Available = true;
-		notifyAll();
+		gui.updateImage1(pic_1, (int)(arrivalTime - timeStampPic1));
+		timeStampPic1 = arrivalTime;
 	}
 
-	public synchronized void updatePicture2(int[] pic) {
+	public synchronized void updatePicture2(byte[] pic) {
+		long arrivalTime = System.currentTimeMillis();
 		this.pic_2 = pic;
-		pic2Available = true;
-		notifyAll();
-	}
-
-	public synchronized int[] getPic1() {
-
-		try {
-			while (!pic1Available) wait();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		pic1Available = false;
-		return pic_1;
-	}
-
-	public synchronized int[] getPic2() {
-
-		try {
-			while (!pic2Available) wait();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		pic2Available = false;
-		return pic_2;
+		gui.updateImage1(pic_2, (int)(arrivalTime - timeStampPic2));
+		timeStampPic2 = arrivalTime;
 	}
 
 }

@@ -7,7 +7,7 @@ public class Display extends Thread {
 		
 	}
 	
-	public void putImage(int[] image) {
+	public void putImage(byte[] image) {
 		
 	}
 	

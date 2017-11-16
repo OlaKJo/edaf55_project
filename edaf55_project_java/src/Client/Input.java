@@ -8,11 +8,6 @@ public class Input extends Thread {
 		
 	}
 	
-	public void putMode(int mode) {
-		
-		
-	}
-	
 	public void run(){
 		
 		

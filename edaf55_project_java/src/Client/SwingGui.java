@@ -179,7 +179,14 @@ public class SwingGui extends javax.swing.JFrame {
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pack();
-	}             
+	}
+	
+	public void updateImage1(byte[] image, int delay) {
+		//TODO
+	}
+	public void updateImage2(byte[] image, int delay) {
+		//TODO
+	}
 
     private void autoRadioButtonActionPerformed(ActionEvent evt) {                                                
     	idleRadioButton.setSelected(false);
