@@ -2,18 +2,17 @@ package client;
 
 public class SendMode extends Thread {
 		
-	public SendMode() {
-		
+	private ClientMonitor monitor;
+	
+	public SendMode(ClientMonitor monitor) {
+		this.monitor = monitor;
 	}
 	
 	public void run(){
-		
-		
-	}
-
-	public void send(boolean sync) {
-		// TODO Auto-generated method stub
-		
+		while(true) {
+			monitor.getModeUpdate();
+			//Send mode
+		}
 	}
 	
 }

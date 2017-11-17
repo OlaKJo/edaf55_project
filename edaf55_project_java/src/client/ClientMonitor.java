@@ -6,19 +6,17 @@ public class ClientMonitor {
 	private boolean sync;
 	private byte[] picBuffer1, picBuffer2;
 	private int delayedFrames;
-	private long prevFrameTime;
+	private long timeStampPic1, timeStampPic2;
+	private boolean modeChanged;
 
-	private SendMode sendModeCam1, sendModeCam2;
 	private Display displayCam1, displayCam2;
 
 	// Number of delayed frames tolerated before mode switch
 	private final int delayedFramesTolerance = 10;
-	private final int MODE_AUTO = 0, MODE_IDLE = 1, MODE_MOVIE = 2;
+	private final long syncToleranceMillis = 200;
+	public static final int MODE_AUTO = 0, MODE_IDLE = 1, MODE_MOVIE = 2, MODE_SYNC = 4, MODE_ASYNC = 5;
 
 	public ClientMonitor(Display displayCam1, Display displayCam2) {
-
-		sendModeCam1 = new SendMode();
-		sendModeCam2 = new SendMode();
 
 		this.displayCam1 = displayCam1;
 		this.displayCam2 = displayCam2;
@@ -26,51 +24,86 @@ public class ClientMonitor {
 		delayedFrames = 0;
 		this.sync = false;
 		mode = MODE_AUTO;
+		modeChanged = false;
 
 	}
-	
+
 	public synchronized void setMode(int mode) {
-		this.mode = mode;
+		if (mode == MODE_SYNC) {
+			setSync(true);
+		} else if (mode == MODE_ASYNC) {
+			setSync(false);
+		} else {
+			this.mode = mode;
+		}
+		modeChanged = true;
+		notifyAll();
 	}
 
 	public synchronized void setSync(boolean sync) {
 
-		if (mode == MODE_AUTO) {
-			if (this.sync == false && sync == true)
-				delayedFrames = -1;// Ignore first frame delay
-			this.sync = sync;
+		if (this.sync == false && sync == true)
+			delayedFrames = -1;// Ignore first frame delay
+		this.sync = sync;
 
-			sendModeCam1.send(sync);
-			sendModeCam2.send(sync);
+		modeChanged = true;
+		notifyAll();
+
+	}
+
+	public synchronized void putPicture(byte[] pic, long timeStamp, int camNumber) {
+		if (camNumber == 1) {
+			picBuffer1 = pic;
+			displayCam1.putImage(pic);
+			timeStampPic1 = timeStamp;
+		} else {
+			picBuffer2 = pic;
+			displayCam2.putImage(pic);
+			timeStampPic2 = timeStamp;
 		}
-
-	}
-
-	public synchronized void putPicture1(byte[] pic) {
-		picBuffer1 = pic;
-		displayCam1.putImage(pic);
 		notifyAll();
 		if (sync)
-			pictureDelayCheck();
+			syncCheck();
 	}
 
-	public synchronized void putPicture2(byte[] pic) {
-		picBuffer2 = pic;
-		displayCam2.putImage(pic);
-		notifyAll();
-		if (sync)
-			pictureDelayCheck();
-	}
-
-	private void pictureDelayCheck() {
-		prevFrameTime += 200;
-		if ((System.currentTimeMillis() - prevFrameTime) > 200) {
+	// Check sync to async conditions
+	private void syncCheck() {
+		if ((timeStampPic1 - System.currentTimeMillis())
+				- (timeStampPic2 - System.currentTimeMillis()) > syncToleranceMillis) {
 			delayedFrames++;
-			if (delayedFrames > delayedFramesTolerance)
+			//Delayed frames, enter asynchronous mode
+			if (delayedFrames > delayedFramesTolerance) {
 				setSync(false);
+				delayedFrames = 10;
+			}
 		} else {
 			delayedFrames = 0;
 		}
+	}
+
+	// Check async to sync conditions
+	private void asyncCheck() {
+		if ((timeStampPic1 - System.currentTimeMillis())
+				- (timeStampPic2 - System.currentTimeMillis()) < syncToleranceMillis) {
+			delayedFrames--;
+			//Delay stabilized, resume synchrous operation
+			if (delayedFrames < delayedFramesTolerance) {
+				setSync(false);
+				delayedFrames = 10;
+			}
+		} else {
+			delayedFrames = 10;
+		}
+	}
+
+	public synchronized int getModeUpdate() {
+		try {
+			while (!modeChanged)
+				wait();
+			modeChanged = false;
+		} catch (InterruptedException e) {
+		}
+		return mode;
 	}
 
 }
