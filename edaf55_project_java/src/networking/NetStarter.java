@@ -1,33 +1,20 @@
 package networking;
 
-import Client.PictureReciever;
-
 public class NetStarter {
 
 	private static class StartClient extends Thread {
 		public void run() {
-			try {
-				System.out.println("Starting network client");
-				NetMonitor monitor = new NetMonitor();
-				Thread[] threads = new Thread[] {
-					new PictureReciever(monitor),
-					new ClientConnectionThread(monitor, "127.0.0.1", 22222),
-					new ClientShutdownThread(monitor)
-				};
-				
-				// Start threads
-				for (Thread thread : threads) thread.start();
-
-				// Interrupt threads after some time
-				Thread.sleep(10000);
-				System.out.println("Interrupting client threads");
-				for (Thread thread : threads) thread.interrupt(); // Interrupt threads
-				for (Thread thread : threads) thread.join(); // Wait for threads to die
-
-				System.out.println("Network client finished");
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			System.out.println("Starting network client");
+			NetMonitor monitor = new NetMonitor();
+			Thread[] threads = new Thread[] {
+				new PicturePoller(monitor),
+				new PictureReciever(monitor),
+				new ClientConnectionThread(monitor, "127.0.0.1", 9999),
+				new ClientShutdownThread(monitor)
+			};
+			
+			// Start threads
+			for (Thread thread : threads) thread.start();
 		}
 	}
 
