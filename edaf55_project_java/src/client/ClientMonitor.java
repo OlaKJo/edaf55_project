@@ -8,8 +8,7 @@ public class ClientMonitor {
 	private int delayedFrames;
 	private long timeStampPic1, timeStampPic2;
 	private boolean modeChanged;
-
-	private Display displayCam1, displayCam2;
+	private boolean pic1Available, pic2Available;
 
 	// Number of delayed frames tolerated before mode switch
 	private final int delayedFramesTolerance = 10;
@@ -18,13 +17,12 @@ public class ClientMonitor {
 
 	public ClientMonitor(Display displayCam1, Display displayCam2) {
 
-		this.displayCam1 = displayCam1;
-		this.displayCam2 = displayCam2;
-
 		delayedFrames = 0;
 		this.sync = false;
 		mode = MODE_AUTO;
 		modeChanged = false;
+		pic1Available = false;
+		pic2Available = false;
 
 	}
 
@@ -54,16 +52,39 @@ public class ClientMonitor {
 	public synchronized void putPicture(byte[] pic, long timeStamp, int camNumber) {
 		if (camNumber == 1) {
 			picBuffer1 = pic;
-			displayCam1.putImage(pic);
 			timeStampPic1 = timeStamp;
+			pic1Available = true;
+			notifyAll();
 		} else {
 			picBuffer2 = pic;
-			displayCam2.putImage(pic);
 			timeStampPic2 = timeStamp;
+			pic2Available = true;
+			notifyAll();
 		}
 		notifyAll();
 		if (sync)
 			syncCheck();
+	}
+	
+	public synchronized byte[] getPicture(int camNumber) {
+		if(camNumber == 1) {		
+				try {
+					while(!pic1Available)wait();
+					pic1Available = false;
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				return picBuffer1;
+		}
+		else {
+				try {
+					while(!pic2Available)wait();
+					pic2Available = false;
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				return picBuffer2;
+		}
 	}
 
 	// Check sync to async conditions
