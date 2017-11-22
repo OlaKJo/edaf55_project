@@ -8,6 +8,7 @@
 #include <string.h>  // for memcpy, memset, strlen
 #include <poll.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #define USE_CAMERA
 
@@ -222,18 +223,19 @@ void* serve_client(void *ctxt)
     while(1)
     {
       memset(client->sendBuff, 0, sizeof(client->sendBuff));
-      int rres = read(client->connfd, buf, 1024);
-      if(rres < 0) {
-          perror("motion_task: read");
-  	return (void*) (intptr_t) errno;
-      }
+      //int rres = read(client->connfd, buf, 1024);
+      sleep(1);
+    //   if(rres < 0) {
+    //       perror("motion_task: read");
+  	// return (void*) (intptr_t) errno;
+    //   }
   #ifdef DEBUG
-      printf("read: rres = %d\n", rres);
+      //printf("read: rres = %d\n", rres);
       printf("buf[%s]\n", buf);
   #endif
       //int hres = parse_http_request(buf, 1024);
-      int hres = 0;
-      if(hres == 0) {
+      //int hres = 0;
+      //if(hres == 0) {
   #ifdef USE_CAMERA
   	    int cres=0;
               if( !client->cam || (cres=try_get_frame(client))) {
@@ -245,7 +247,7 @@ void* serve_client(void *ctxt)
   	client_write_string(client);
   #endif
 
-      }
+      //}
     }
     return (void*) (intptr_t) close(client->connfd);
 }
