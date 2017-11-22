@@ -34,7 +34,7 @@ public class SwingGui extends javax.swing.JFrame {
 	private JLabel syncLabel;
 
 	private boolean newInput;
-	private int oldMode, mode;
+	private int mode, syncMode;
 
 	public static void main(String args[]) {
 		try {
@@ -64,7 +64,7 @@ public class SwingGui extends javax.swing.JFrame {
 	public SwingGui() {
 		initComponents();
 		newInput = false;
-		mode = oldMode = ClientMonitor.MODE_AUTO;
+		mode = ClientMonitor.MODE_AUTO;
 	}
 
 	private void initComponents() {
@@ -185,17 +185,19 @@ public class SwingGui extends javax.swing.JFrame {
 		// TODO
 	}
 
-	public int getInput() {
+	/*
+	 * @return a vector containing {Mode, Synchronized}
+	 */
+	public int[] getInput() {
 		try {
 			while (!newInput)
 				wait();
 			newInput = false;
-
-			oldMode = mode;
-			return mode;
+			
+			return new int[] {mode,syncMode};
 
 		} catch (InterruptedException e) {
-			return 0;
+			return null;
 		}
 	}
 
@@ -203,6 +205,7 @@ public class SwingGui extends javax.swing.JFrame {
 		idleRadioButton.setSelected(false);
 		movieRadioButton.setSelected(false);
 		newInput = true;
+		mode = ClientMonitor.MODE_AUTO;
 		notifyAll();
 	}
 
@@ -210,6 +213,7 @@ public class SwingGui extends javax.swing.JFrame {
 		autoRadioButton.setSelected(false);
 		movieRadioButton.setSelected(false);
 		newInput = true;
+		mode = ClientMonitor.MODE_IDLE;
 		notifyAll();
 	}
 
@@ -217,10 +221,12 @@ public class SwingGui extends javax.swing.JFrame {
 		autoRadioButton.setSelected(false);
 		idleRadioButton.setSelected(false);
 		newInput = true;
+		mode = ClientMonitor.MODE_MOVIE;
 		notifyAll();
 	}
 
 	private void syncCheckBoxActionPerformed(ActionEvent evt) {
-		
+		newInput = true;
+		syncMode = syncCheckBox.isSelected() ? ClientMonitor.MODE_ASYNC : ClientMonitor.MODE_SYNC;
 	}
 }
