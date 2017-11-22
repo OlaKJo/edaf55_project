@@ -36,7 +36,7 @@ public class SwingGui extends javax.swing.JFrame {
 	private boolean newInput;
 	private int mode, syncMode;
 
-	public static void main(String args[]) {
+	public void StartGui() {
 		try {
 			for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {

@@ -57,8 +57,12 @@ public class ClientMonitor {
 			notifyAll();
 		}
 		notifyAll();
-		if (mode == MODE_AUTO && sync == false)
+		if (mode == MODE_AUTO && sync == false) {
 			syncCheck();
+		}
+		else if(mode == MODE_AUTO && sync == false){
+			
+		}
 	}
 
 	public synchronized byte[] getPicture(int camNumber) {
@@ -85,8 +89,9 @@ public class ClientMonitor {
 
 	// Check sync to async conditions
 	private void syncCheck() {
-		if ((timeStampPic1 - System.currentTimeMillis())
-				- (timeStampPic2 - System.currentTimeMillis()) > syncToleranceMillis) {
+		long currentTimeStamp = System.currentTimeMillis();
+		if ((timeStampPic1 - currentTimeStamp)
+				- (timeStampPic2 -currentTimeStamp) > syncToleranceMillis) {
 			delayedFrames++;
 			// Delayed frames, enter asynchronous mode
 			if (delayedFrames > delayedFramesTolerance) {

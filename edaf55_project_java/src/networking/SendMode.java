@@ -29,10 +29,12 @@ public class SendMode extends Thread {
 
 				Socket socket = monitor.getSocket();
 				OutputStream os = socket.getOutputStream();
+				boolean mode = true;
 				
 				// Send data packages of different sizes
 				while (true) {
-					boolean mode = cMon.getModeUpdate();
+					//boolean mode = cMon.getModeUpdate();
+					mode = !mode;
 					ModePack.pack(buffer, mode);
 					//Utils.printBuffer("ClientWriteThread", size, buffer);
 
@@ -41,6 +43,7 @@ public class SendMode extends Thread {
 					
 					// Flush data
 					os.flush();
+					Thread.sleep(100);
 				}
 			} catch (IOException e) {
 				// Something happened with the connection
