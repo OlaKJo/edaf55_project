@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -77,9 +78,9 @@ public class SwingGui extends javax.swing.JFrame {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		ImageIcon icon = new ImageIcon(img);
-		imageIcon1 = null;
-		imageIcon2 = null;
+
+		imageIcon1 = new ImageIcon(img);
+		imageIcon2 = new ImageIcon(img);
 
 		delayLabel1 = new JLabel();
 		syncCheckBox = new JCheckBox();
@@ -89,8 +90,8 @@ public class SwingGui extends javax.swing.JFrame {
 		movieRadioButton = new JRadioButton();
 		syncLabel = new JLabel();
 		delayLabel2 = new JLabel();
-		image1 = new JLabel(icon);
-		image2 = new JLabel(icon);
+		image1 = new JLabel(imageIcon1);
+		image2 = new JLabel(imageIcon2);
 
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -136,18 +137,19 @@ public class SwingGui extends javax.swing.JFrame {
 	private void generateLayout() {
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
-		layout.setHorizontalGroup(
-				layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-						.addGroup(layout.createSequentialGroup().addContainerGap()
-								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-										.addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+		layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+				.addGroup(layout.createSequentialGroup().addContainerGap()
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+								.addGroup(GroupLayout.Alignment.TRAILING,
+										layout.createSequentialGroup()
 												.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 														.addComponent(image1).addComponent(delayLabel1))
 												.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
 														GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 												.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 														.addComponent(delayLabel2).addComponent(image2)))
-										.addGroup(layout.createSequentialGroup().addComponent(autoRadioButton)
+								.addGroup(
+										layout.createSequentialGroup().addComponent(autoRadioButton)
 												.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
 												.addComponent(idleRadioButton)
 												.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -155,54 +157,51 @@ public class SwingGui extends javax.swing.JFrame {
 												.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 95,
 														Short.MAX_VALUE)
 												.addComponent(syncLabel))
-										.addGroup(layout.createSequentialGroup().addComponent(modeLabel)
-												.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
-														javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-												.addComponent(syncCheckBox)))
-								.addContainerGap()));
-		layout.setVerticalGroup(
-				layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-						.addGroup(layout.createSequentialGroup().addContainerGap()
+								.addGroup(layout.createSequentialGroup().addComponent(modeLabel)
+										.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+												javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(syncCheckBox)))
+						.addContainerGap()));
+		layout.setVerticalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+				.addGroup(layout.createSequentialGroup().addContainerGap()
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(image1)
+								.addComponent(image2))
+						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(delayLabel1)
+								.addComponent(delayLabel2))
+						.addGap(18, 18, 18)
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(modeLabel)
+								.addComponent(syncCheckBox))
+						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-										.addComponent(image1).addComponent(image2))
-								.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-										.addComponent(delayLabel1).addComponent(delayLabel2))
-								.addGap(18, 18, 18)
-								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-										.addComponent(modeLabel).addComponent(syncCheckBox))
-								.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-										.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-												.addComponent(autoRadioButton).addComponent(idleRadioButton)
-												.addComponent(movieRadioButton))
-										.addComponent(syncLabel))
-								.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+										.addComponent(autoRadioButton).addComponent(idleRadioButton).addComponent(
+												movieRadioButton))
+								.addComponent(syncLabel))
+						.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 		pack();
 	}
 
 	private void updateImage(byte[] image, JLabel label) {
-		try {
-			label.setIcon(new ImageIcon(ImageIO.read(new ByteArrayInputStream(image))));
-			label.repaint();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		label.setIcon(new ImageIcon(image));
+
+		label.repaint();
+		
 	}
 
 	public void updateImage2(byte[] image) {
 		updateImage(image, image2);
 	}
-	
+
 	public void updateImage1(byte[] image) {
 		updateImage(image, image1);
 		System.out.println("Image updated in gui");
 	}
-	
-	public void setSyncLabel(boolean synced){
-		if(synced){
+
+	public void setSyncLabel(boolean synced) {
+		if (synced) {
 			syncLabel = new JLabel("Synchronous");
-		}else{
+		} else {
 			syncLabel = new JLabel("Asynchronous");
 		}
 		repaint();
@@ -216,8 +215,8 @@ public class SwingGui extends javax.swing.JFrame {
 			while (!newInput)
 				wait();
 			newInput = false;
-			
-			return new int[] {mode,syncMode};
+
+			return new int[] { mode, syncMode };
 
 		} catch (InterruptedException e) {
 			return null;
@@ -252,14 +251,5 @@ public class SwingGui extends javax.swing.JFrame {
 		newInput = true;
 		syncMode = syncCheckBox.isSelected() ? ClientMonitor.MODE_ASYNC : ClientMonitor.MODE_SYNC;
 	}
-	
-	public static void main(String[] args){
-		
-		SwingGui gui = new SwingGui();
-		gui.StartGui();
-		byte[] a = {(byte) 0x99,0x57,0x42,0x23,0x67,0x23,0x53,0x24,(byte) 0xbb};
-		gui.updateImage1(a);
-		
-	}
-	
+
 }
