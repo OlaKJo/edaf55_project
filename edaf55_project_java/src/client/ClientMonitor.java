@@ -15,7 +15,7 @@ public class ClientMonitor {
 	private final long syncToleranceMillis = 200;
 	public static final int MODE_AUTO = 0, MODE_IDLE = 1, MODE_MOVIE = 2, MODE_SYNC = 4, MODE_ASYNC = 5;
 
-	public ClientMonitor(Display displayCam1, Display displayCam2) {
+	public ClientMonitor() {
 
 		delayedFrames = 0;
 		this.sync = false;
@@ -57,7 +57,7 @@ public class ClientMonitor {
 			notifyAll();
 		}
 		notifyAll();
-		if (sync)
+		if (mode == MODE_AUTO && sync == false)
 			syncCheck();
 	}
 
@@ -90,7 +90,9 @@ public class ClientMonitor {
 			delayedFrames++;
 			// Delayed frames, enter asynchronous mode
 			if (delayedFrames > delayedFramesTolerance) {
-				setSync(false);
+				mode = MODE_IDLE;
+				modeChanged = true;
+				notifyAll();
 				delayedFrames = 10;
 			}
 		} else {
@@ -105,7 +107,9 @@ public class ClientMonitor {
 			delayedFrames--;
 			// Delay stabilized, resume synchrous operation
 			if (delayedFrames < delayedFramesTolerance) {
-				setSync(false);
+				mode = MODE_MOVIE;
+				modeChanged = true;
+				notifyAll();
 				delayedFrames = 10;
 			}
 		} else {
@@ -113,14 +117,19 @@ public class ClientMonitor {
 		}
 	}
 
-	public synchronized int getModeUpdate() {
+	public synchronized boolean getModeUpdate() {
 		try {
 			while (!modeChanged)
 				wait();
 			modeChanged = false;
+
 		} catch (InterruptedException e) {
 		}
-		return mode;
+		if (mode == MODE_MOVIE) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

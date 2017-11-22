@@ -4,7 +4,7 @@ package networking;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class Pack {
+public class PicturePack {
 	public static final int HEAD_SIZE = 10;
 
 	// ... and then the payload

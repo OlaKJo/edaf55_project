@@ -17,11 +17,10 @@ public class PictureReciever extends Thread {
 	private final int MAXIMUM_PICTURE_SIZE = 50000;
 	private int CAM_NBR;
 
-	public PictureReciever(NetMonitor mon, ClientMonitor clientMonitor, int CAM_NBR) {
+	public PictureReciever(NetMonitor mon, ClientMonitor clientMonitor) {
 		netMonitor = mon;
 		this.clientMonitor = clientMonitor;
 		buffer = new byte[MAXIMUM_PICTURE_SIZE];
-		this.CAM_NBR = CAM_NBR;
 	}
 
 	// Receive packages of random size from active connections.
@@ -38,7 +37,7 @@ public class PictureReciever extends Thread {
 				while (running) {
 
 					// Read header
-					int size = Pack.HEAD_SIZE;
+					int size = PicturePack.HEAD_SIZE;
 					int n = 0;
 					while ((n = is.read(buffer, n, size)) > 0) {
 						size -= n;
@@ -46,15 +45,15 @@ public class PictureReciever extends Thread {
 					if (size != 0)
 						break;
 
-					long ts = Pack.getTimeStamp(buffer);
-					int pictureSize = Pack.getPictureSize(buffer);
+					long ts = PicturePack.getTimeStamp(buffer);
+					int pictureSize = PicturePack.getPictureSize(buffer);
 					System.out.println("pictureSize: " + pictureSize);
 					System.out.print("Timestamp: " + ts);
 					
 					// Read image data
 					size = pictureSize;
 					n = 0;
-					while ((n = is.read(buffer, n + Pack.HEAD_SIZE, size)) > 0) {
+					while ((n = is.read(buffer, n + PicturePack.HEAD_SIZE, size)) > 0) {
 						System.out.println(size);
 						size -= n;
 					}
@@ -62,7 +61,7 @@ public class PictureReciever extends Thread {
 						break;
 
 					byte[] imageData = new byte[pictureSize];
-					System.arraycopy(buffer, Pack.HEAD_SIZE, imageData, 0, pictureSize);
+					System.arraycopy(buffer, PicturePack.HEAD_SIZE, imageData, 0, pictureSize);
 					
 					//put image in monitor
 					//TODO: Fix timestamp for incoming images
