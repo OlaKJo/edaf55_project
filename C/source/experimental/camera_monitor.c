@@ -1,12 +1,26 @@
-struct camera_monitor {
-  byte pictureData[BUFSIZE];
-  int mode;
-  bool pic_taken;
-  bool pic_sent;
-};
+#include "camera_monitor.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>  // for memcpy, memset, strlen
+#include <poll.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <stdbool.h>
 
-struct camera_monitor * cam_mon;
-pthread_mutex_t camera_mutex;
+#ifdef USE_CAMERA
+#include "camera.h"
+#endif
+
+void init(void) {
+  cam_mon = malloc(sizeof(*cam_mon));
+  cam_mon->pic_sent = false;
+  cam_mon->pic_taken = false;
+  cam_mon->mode = IDLE_MODE;
+}
 
 void set_mode(int val) {
   pthread_mutex_lock(&camera_mutex);
