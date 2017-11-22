@@ -45,23 +45,22 @@ public class ClientMonitor {
 	}
 
 	public synchronized void putPicture(byte[] pic, long timeStamp, int camNumber) {
+		System.out.println("Image put in clientMonitor");
 		if (camNumber == 1) {
 			picBuffer1 = pic;
 			timeStampPic1 = timeStamp;
 			pic1Available = true;
-			notifyAll();
 		} else {
 			picBuffer2 = pic;
 			timeStampPic2 = timeStamp;
 			pic2Available = true;
-			notifyAll();
 		}
 		notifyAll();
 		if (mode == MODE_AUTO && sync == false) {
 			syncCheck();
 		}
 		else if(mode == MODE_AUTO && sync == false){
-			
+			asyncCheck();
 		}
 	}
 
@@ -70,6 +69,7 @@ public class ClientMonitor {
 			try {
 				while (!pic1Available)
 					wait();
+				System.out.println("Image returned from ClientMonitor");
 				pic1Available = false;
 			} catch (InterruptedException e) {
 				e.printStackTrace();

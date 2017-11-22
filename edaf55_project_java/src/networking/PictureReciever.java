@@ -65,7 +65,6 @@ public class PictureReciever extends Thread {
 					System.arraycopy(buffer, PicturePack.HEAD_SIZE, imageData, 0, pictureSize);
 					
 					//put image in monitor
-					//TODO: Fix timestamp for incoming images
 					clientMonitor.putPicture(imageData, ts ,camNbr);
 
 					// ImageIcon a = new ImageIcon(imageData);

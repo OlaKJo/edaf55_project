@@ -22,14 +22,16 @@ public class CameraClientMain {
 		
 		PictureNetStarter picCam1 = new PictureNetStarter(cm, ipCam1, 8002, camNbr1);
 		PictureNetStarter picCam2 = new PictureNetStarter(cm, ipCam2, 8005, camNbr1);
-		ModeNetStarter modeCam1 = new ModeNetStarter(cm, ipCam1, 8001);
-		ModeNetStarter modeCam2 = new ModeNetStarter(cm, ipCam2, 8004);
+//		ModeNetStarter modeCam1 = new ModeNetStarter(cm, ipCam1, 8001);
+//		ModeNetStarter modeCam2 = new ModeNetStarter(cm, ipCam2, 8004);
 		
 		gui.StartGui();
 		display1.start();
 		display2.start();
-		modeCam1.startMe();
-		modeCam2.startMe();
+		picCam1.startMe();
+//		picCam2.startMe();
+//		modeCam1.startMe();
+//		modeCam2.startMe();
 	}
 	
 }
