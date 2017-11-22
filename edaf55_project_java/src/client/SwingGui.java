@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -32,6 +33,7 @@ public class SwingGui extends javax.swing.JFrame {
 	private JRadioButton movieRadioButton;
 	private JCheckBox syncCheckBox;
 	private JLabel syncLabel;
+	private ImageIcon imageIcon1, imageIcon2;
 
 	private boolean newInput;
 	private int mode, syncMode;
@@ -76,6 +78,8 @@ public class SwingGui extends javax.swing.JFrame {
 			e.printStackTrace();
 		}
 		ImageIcon icon = new ImageIcon(img);
+		imageIcon1 = null;
+		imageIcon2 = null;
 
 		delayLabel1 = new JLabel();
 		syncCheckBox = new JCheckBox();
@@ -177,12 +181,31 @@ public class SwingGui extends javax.swing.JFrame {
 		pack();
 	}
 
-	public void updateImage1(byte[] image, int delay) {
-		// TODO
+	private void updateImage(byte[] image, JLabel label) {
+		try {
+			label.setIcon(new ImageIcon(ImageIO.read(new ByteArrayInputStream(image))));
+			label.repaint();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public void updateImage2(byte[] image, int delay) {
-		// TODO
+	public void updateImage2(byte[] image) {
+		updateImage(image, image2);
+	}
+	
+	public void updateImage1(byte[] image) {
+		updateImage(image, image1);
+		System.out.println("Image updated in gui");
+	}
+	
+	public void setSyncLabel(boolean synced){
+		if(synced){
+			syncLabel = new JLabel("Synchronous");
+		}else{
+			syncLabel = new JLabel("Asynchronous");
+		}
+		repaint();
 	}
 
 	/*
@@ -229,4 +252,14 @@ public class SwingGui extends javax.swing.JFrame {
 		newInput = true;
 		syncMode = syncCheckBox.isSelected() ? ClientMonitor.MODE_ASYNC : ClientMonitor.MODE_SYNC;
 	}
+	
+	public static void main(String[] args){
+		
+		SwingGui gui = new SwingGui();
+		gui.StartGui();
+		byte[] a = {(byte) 0x99,0x57,0x42,0x23,0x67,0x23,0x53,0x24,(byte) 0xbb};
+		gui.updateImage1(a);
+		
+	}
+	
 }

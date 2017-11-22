@@ -4,18 +4,18 @@ public class Display extends Thread {
 	
 	private ClientMonitor clientMonitor;
 	private DisplayMonitor displayMonitor;
-	private int CAM_NBR;
+	private int camNbr;
 	
 	public Display(DisplayMonitor displayMonitor, ClientMonitor clientMonitor, int CAM_NBR) {
 		this.displayMonitor = displayMonitor;
 		this.clientMonitor = clientMonitor;
-		this.CAM_NBR = CAM_NBR;
+		this.camNbr = CAM_NBR;
 	}
 	
 	public void run() {
 		while(true) {
-			byte[] pic = clientMonitor.getPicture(CAM_NBR);
-			if(CAM_NBR == 1) {
+			byte[] pic = clientMonitor.getPicture(camNbr);
+			if(camNbr == 1) {
 				displayMonitor.updatePicture1(pic);
 			}
 			else {
