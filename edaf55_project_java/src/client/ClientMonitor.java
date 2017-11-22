@@ -27,13 +27,8 @@ public class ClientMonitor {
 	}
 
 	public synchronized void setMode(int mode) {
-		if (mode == MODE_SYNC) {
-			setSync(true);
-		} else if (mode == MODE_ASYNC) {
-			setSync(false);
-		} else {
-			this.mode = mode;
-		}
+
+		this.mode = mode;
 		modeChanged = true;
 		notifyAll();
 	}
@@ -65,25 +60,26 @@ public class ClientMonitor {
 		if (sync)
 			syncCheck();
 	}
-	
+
 	public synchronized byte[] getPicture(int camNumber) {
-		if(camNumber == 1) {		
-				try {
-					while(!pic1Available)wait();
-					pic1Available = false;
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				return picBuffer1;
-		}
-		else {
-				try {
-					while(!pic2Available)wait();
-					pic2Available = false;
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				return picBuffer2;
+		if (camNumber == 1) {
+			try {
+				while (!pic1Available)
+					wait();
+				pic1Available = false;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			return picBuffer1;
+		} else {
+			try {
+				while (!pic2Available)
+					wait();
+				pic2Available = false;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			return picBuffer2;
 		}
 	}
 
@@ -92,7 +88,7 @@ public class ClientMonitor {
 		if ((timeStampPic1 - System.currentTimeMillis())
 				- (timeStampPic2 - System.currentTimeMillis()) > syncToleranceMillis) {
 			delayedFrames++;
-			//Delayed frames, enter asynchronous mode
+			// Delayed frames, enter asynchronous mode
 			if (delayedFrames > delayedFramesTolerance) {
 				setSync(false);
 				delayedFrames = 10;
@@ -107,7 +103,7 @@ public class ClientMonitor {
 		if ((timeStampPic1 - System.currentTimeMillis())
 				- (timeStampPic2 - System.currentTimeMillis()) < syncToleranceMillis) {
 			delayedFrames--;
-			//Delay stabilized, resume synchrous operation
+			// Delay stabilized, resume synchrous operation
 			if (delayedFrames < delayedFramesTolerance) {
 				setSync(false);
 				delayedFrames = 10;
