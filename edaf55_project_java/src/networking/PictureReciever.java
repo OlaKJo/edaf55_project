@@ -17,11 +17,10 @@ public class PictureReciever extends Thread {
 	private final int MAXIMUM_PICTURE_SIZE = 50000;
 	private int CAM_NBR;
 
-	public PictureReciever(NetMonitor mon, ClientMonitor clientMonitor, int CAM_NBR) {
+	public PictureReciever(NetMonitor mon, ClientMonitor clientMonitor) {
 		netMonitor = mon;
 		this.clientMonitor = clientMonitor;
 		buffer = new byte[MAXIMUM_PICTURE_SIZE];
-		this.CAM_NBR = CAM_NBR;
 	}
 
 	// Receive packages of random size from active connections.
