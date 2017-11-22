@@ -114,8 +114,9 @@ struct global_state {
     int quit;
     pthread_t main_thread;
     pthread_t client_thread;
-    pthread_t ui_thread;
+    //pthread_t ui_thread;
     pthread_t bg_thread;
+    pthread_t update_mode_thread;
     struct pollfd pfd;
     int motionfd;
 #ifdef USE_CAMERA
@@ -324,6 +325,29 @@ void* serve_client(void *ctxt)
     return (void*) (intptr_t) close(client->connfd);
 }
 
+/* The function for a thread that processes a single client request.
+ * The client struct pointer is passed as void* due to the pthreads API
+*/
+void* update_mode_task(void *ctxt)
+{
+    char buf[1] = {};
+    struct client* client = ctxt;
+    while(1)
+    {
+      int rres = read(client->connfd, buf, 1);
+      if(rres < 0) {
+          perror("update_mode_task: read");
+  	return (void*) (intptr_t) errno;
+      }
+  #ifdef DEBUG
+      printf("read: rres = %d\n", rres);
+      printf("buf[%s]\n", buf);
+  #endif
+      set_mode(buf[0]);
+    }
+    return (void*) (intptr_t) close(client->connfd);
+}
+
 /* signal the global condition variable
  */
 void signal_to_bg_task()
@@ -368,7 +392,6 @@ void* main_task(void *ctxt)
     return (void*) (intptr_t) serve_clients(state);
 }
 
-
 int try_accept(struct global_state* state, struct client* client)
 {
     int result = 0;
@@ -404,6 +427,23 @@ int try_accept(struct global_state* state, struct client* client)
 #endif
             }
         }
+
+        if (pthread_create(&state->update_mode_thread, 0, update_mode_task, client)) {
+            printf("Error pthread_create()\n");
+            perror("creating");
+            result = errno;
+        } else {
+            void* status;
+            if(pthread_join(state->client_thread, &status)){
+                perror("join");
+                result = errno;
+            } else {
+#ifdef DEBUG
+		printf("Join: status = %d\n", (int)(intptr_t) status);
+#endif
+            }
+        }
+
     }
     return result;
 }
@@ -427,6 +467,7 @@ static int create_threads(struct global_state* state)
         state->running=0;
         goto failed_to_start_main_thread;
     }
+
 failed_to_start_main_thread:
 failed_to_start_bg_thread:
     pthread_mutex_unlock(&global_mutex);
