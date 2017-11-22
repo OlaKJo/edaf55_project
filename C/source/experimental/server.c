@@ -209,7 +209,8 @@ int client_send_frame(struct client* client, frame* fr)
 
     size_t frame_sz = get_frame_size(fr);
     size_t time_stamp = get_frame_timestamp(fr);
-    byte* data = get_frame_bytes(fr);
+    save_pic(get_frame_bytes(fr));
+    byte data[BUFSIZE];
     int result;
 
 printf("camera_get_frame: ts=%llu\n", get_frame_timestamp(fr));
@@ -224,6 +225,7 @@ printf("camera_get_frame: ts=%llu\n", get_frame_timestamp(fr));
         printf("encode size:" FORMAT_FOR_SIZE_T "\n",  frame_sz);
         printf("sizeof(size_t)=" FORMAT_FOR_SIZE_T ", sizeof(uint32_t)=" FORMAT_FOR_SIZE_T "\n", sizeof(size_t), sizeof(uint32_t));
 #endif
+        get_pic(data);
         memcpy(client->frame_data, data, frame_sz);
 
         written=client_write_n(client, packet_sz);
@@ -449,6 +451,10 @@ static void client_init(struct client* client)
 int serve_clients(struct global_state* state)
 {
     cam_mon = malloc(sizeof(*cam_mon));
+    cam_mon->pic_sent = false;
+    cam_mon->pic_taken = false;
+    cam_mon->mode = IDLE_MODE;
+
     pthread_mutex_init(&camera_mutex, NULL);
 
     int result=0;
@@ -558,17 +564,15 @@ int bind_and_listen(struct global_state* state, int port)
 
 int main(int argc, char *argv[])
 {
-    cam_mon = malloc(sizeof(*cam_mon));
-    pthread_mutex_init(&camera_mutex, NULL);
-
-    cam_mon->mode = MOVIE_MODE;
-    cam_mon->pic_sent = true;
-    cam_mon->pic_taken = false;
-
-    bool check_pic_sent = get_pic_sent();
-    check_pic_sent = set_pic_sent(false);
-
-
+    // cam_mon = malloc(sizeof(*cam_mon));
+    // pthread_mutex_init(&camera_mutex, NULL);
+    //
+    // cam_mon->mode = MOVIE_MODE;
+    // cam_mon->pic_sent = true;
+    // cam_mon->pic_taken = false;
+    //
+    // bool check_pic_sent = get_pic_sent();
+    // check_pic_sent = set_pic_sent(false);
 
     int port;
     struct global_state state;
