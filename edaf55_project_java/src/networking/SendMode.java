@@ -43,7 +43,7 @@ public class SendMode extends Thread {
 					
 					// Flush data
 					os.flush();
-					Thread.sleep(100);
+					Thread.sleep(5000);
 				}
 			} catch (IOException e) {
 				// Something happened with the connection

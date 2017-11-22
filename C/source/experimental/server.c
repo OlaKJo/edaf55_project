@@ -119,6 +119,7 @@ struct global_state {
     pthread_t update_mode_thread;
     struct pollfd pfd;
     int motionfd;
+    int modefd;
 #ifdef USE_CAMERA
     camera* cam;
 #endif
@@ -344,6 +345,7 @@ void* update_mode_task(void *ctxt)
       printf("buf[%s]\n", buf);
   #endif
       set_mode(buf[0]);
+      printf("mode update received!\n");
     }
     return (void*) (intptr_t) close(client->connfd);
 }
@@ -563,8 +565,9 @@ int create_socket(struct global_state* state)
     int reuse;
     state->listenfd = socket(AF_INET, SOCK_STREAM, 0);
     state->motionfd = socket(AF_INET, SOCK_STREAM, 0);
+    state->modefd   = socket(AF_INET, SOCK_STREAM, 0);
 
-    if(state->listenfd < 0 || state->motionfd < 0) {
+    if(state->listenfd < 0 || state->motionfd < 0 || state->modefd < 0) {
         perror("socket");
         return errno;
     }
@@ -604,6 +607,28 @@ int bind_and_listen(struct global_state* state, int port)
     return 0;
 }
 
+int bind_and_listen_mode(struct global_state* state, int port)
+{
+    struct sockaddr_in serv_addr;
+
+    memset(&serv_addr, 0, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serv_addr.sin_port = htons(port);
+
+    if( bind(state->modefd, (struct sockaddr*)&serv_addr, sizeof(serv_addr))) {
+        perror("bind modefd");
+        return errno;
+    }
+
+    if(listen(state->modefd, 10)){
+        perror("listen modefd");
+        return errno;
+    }
+
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     // cam_mon = malloc(sizeof(*cam_mon));
@@ -637,6 +662,11 @@ int main(int argc, char *argv[])
     if(bind_and_listen(&state, port)) {
         goto failed_to_listen;
     }
+
+    // if(bind_and_listen_mode(&state, 9998)) {
+    //     goto failed_to_listen_mode;
+    // }
+
     pthread_mutex_lock(&global_mutex);
     state.running = 1;
     pthread_mutex_unlock(&global_mutex);
@@ -647,9 +677,11 @@ int main(int argc, char *argv[])
 
     join_bg_thread(&state.bg_thread, "bg_thread");
     join_bg_thread(&state.main_thread, "main_thread");
+    join_bg_thread(&state.update_mode_thread, "update_mode_thread");
 
 failed_to_start_threads:
 failed_to_listen:
+failed_to_listen_mode:
     if(close(state.listenfd)) perror("closing listenfd");
 no_server_socket:
   return result;

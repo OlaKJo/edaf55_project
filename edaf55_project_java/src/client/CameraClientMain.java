@@ -20,17 +20,17 @@ public class CameraClientMain {
 		Display display2 = new Display(dm, cm, camNbr2);
 		Input input = new Input(cm, gui);
 		
-		PictureNetStarter picCam1 = new PictureNetStarter(cm, ipCam1, 8002, camNbr1);
-		PictureNetStarter picCam2 = new PictureNetStarter(cm, ipCam2, 8005, camNbr1);
-//		ModeNetStarter modeCam1 = new ModeNetStarter(cm, ipCam1, 8001);
+		PictureNetStarter picCam1 = new PictureNetStarter(cm, ipCam1, 9999, camNbr1);
+		//PictureNetStarter picCam2 = new PictureNetStarter(cm, ipCam2, 8005, camNbr1);
+		ModeNetStarter modeCam1 = new ModeNetStarter(cm, ipCam1, 9998);
 //		ModeNetStarter modeCam2 = new ModeNetStarter(cm, ipCam2, 8004);
 		
 		gui.StartGui();
 		display1.start();
 		display2.start();
-		picCam1.startMe();
+//		picCam1.startMe();
 //		picCam2.startMe();
-//		modeCam1.startMe();
+		modeCam1.startMe();
 //		modeCam2.startMe();
 	}
 	
