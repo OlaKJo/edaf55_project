@@ -7,7 +7,7 @@ public class NetStarter {
 		public void run() {
 			System.out.println("Starting network client");
 			NetMonitor monitor = new NetMonitor();
-			ClientMonitor clientMonitor = new ClientMonitor(null, null);
+			ClientMonitor clientMonitor = new ClientMonitor();
 			Thread[] threads = new Thread[] {
 				new PicturePoller(monitor),
 				new PictureReciever(monitor, clientMonitor, 1),
