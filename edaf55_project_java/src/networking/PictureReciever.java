@@ -15,12 +15,13 @@ public class PictureReciever extends Thread {
 	private ClientMonitor clientMonitor;
 	private byte[] buffer;
 	private final int MAXIMUM_PICTURE_SIZE = 50000;
-	private int CAM_NBR;
+	private int camNbr;
 
-	public PictureReciever(NetMonitor mon, ClientMonitor clientMonitor) {
+	public PictureReciever(NetMonitor mon, ClientMonitor clientMonitor, int camNbr) {
 		netMonitor = mon;
 		this.clientMonitor = clientMonitor;
 		buffer = new byte[MAXIMUM_PICTURE_SIZE];
+		this.camNbr = camNbr;
 	}
 
 	// Receive packages of random size from active connections.
@@ -65,7 +66,7 @@ public class PictureReciever extends Thread {
 					
 					//put image in monitor
 					//TODO: Fix timestamp for incoming images
-					clientMonitor.putPicture(imageData, ts ,CAM_NBR);
+					clientMonitor.putPicture(imageData, ts ,camNbr);
 
 					// ImageIcon a = new ImageIcon(imageData);
 				}

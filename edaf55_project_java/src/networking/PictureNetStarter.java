@@ -9,14 +9,14 @@ public class PictureNetStarter {
 	private NetMonitor netMon;
 	private Thread[] threads;
 	
-	public PictureNetStarter(ClientMonitor cMon, String ip, int port) {
+	public PictureNetStarter(ClientMonitor cMon, String ip, int port, int camNbr) {
 		this.cMon = cMon;
 		this.ip = ip;
 		this.port = port;
 		
 		netMon = new NetMonitor();
 		threads = new Thread[] {
-			new PictureReciever(netMon, cMon),
+			new PictureReciever(netMon, cMon, camNbr),
 			new ClientConnectionThread(netMon, ip, port),
 			new ClientShutdownThread(netMon)
 		};

@@ -5,7 +5,7 @@ public class Input extends Thread {
 	private ClientMonitor monitor;
 	private SwingGui gui;
 
-	private Input(ClientMonitor monitor, SwingGui gui) {
+	public Input(ClientMonitor monitor, SwingGui gui) {
 		this.monitor = monitor;
 		this.gui = gui;
 	}
