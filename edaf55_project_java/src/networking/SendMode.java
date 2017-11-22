@@ -56,6 +56,6 @@ public class SendMode extends Thread {
 			}
 		}
 		
-		System.out.println("Exiting ClientWriteThread");
+		System.out.println("Exiting SendMode");
 	}
 }
