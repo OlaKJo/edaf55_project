@@ -15,7 +15,7 @@ public class ClientMonitor {
 	private final long syncToleranceMillis = 200;
 	public static final int MODE_AUTO = 0, MODE_IDLE = 1, MODE_MOVIE = 2, MODE_SYNC = 4, MODE_ASYNC = 5;
 
-	public ClientMonitor(Display displayCam1, Display displayCam2) {
+	public ClientMonitor() {
 
 		delayedFrames = 0;
 		this.sync = false;
@@ -57,7 +57,7 @@ public class ClientMonitor {
 			notifyAll();
 		}
 		notifyAll();
-		if (mode == MODE_AUTO)
+		if (mode == MODE_AUTO && sync == false)
 			syncCheck();
 	}
 
