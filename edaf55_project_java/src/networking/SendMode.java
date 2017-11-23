@@ -25,7 +25,9 @@ public class SendMode extends Thread {
 		{
 			try {
 				// Blocking wait for connection
+				System.out.println("waiting for connection to mode socket");
 				monitor.waitUntilActive();
+				System.out.println("received connection to mode socket");
 
 				Socket socket = monitor.getSocket();
 				OutputStream os = socket.getOutputStream();
@@ -44,6 +46,7 @@ public class SendMode extends Thread {
 					// Flush data
 					os.flush();
 					Thread.sleep(5000);
+					System.out.println("wrote mode to stream: " + mode);
 				}
 			} catch (IOException e) {
 				// Something happened with the connection

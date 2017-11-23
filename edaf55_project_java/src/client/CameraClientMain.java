@@ -28,7 +28,7 @@ public class CameraClientMain {
 		gui.StartGui();
 		display1.start();
 		display2.start();
-//		picCam1.startMe();
+		picCam1.startMe();
 //		picCam2.startMe();
 		modeCam1.startMe();
 //		modeCam2.startMe();

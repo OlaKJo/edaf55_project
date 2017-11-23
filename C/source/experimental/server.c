@@ -419,6 +419,7 @@ int try_accept(struct global_state* state, struct client* client)
             perror("creating");
             result = errno;
         } else {
+            printf("serve_client run in try_accept");
             void* status;
             if(pthread_join(state->client_thread, &status)){
                 perror("join");
@@ -435,6 +436,7 @@ int try_accept(struct global_state* state, struct client* client)
             perror("creating");
             result = errno;
         } else {
+          printf("update_mode_task run in try_accept");
             void* status;
             if(pthread_join(state->client_thread, &status)){
                 perror("join");
@@ -663,9 +665,9 @@ int main(int argc, char *argv[])
         goto failed_to_listen;
     }
 
-    // if(bind_and_listen_mode(&state, 9998)) {
-    //     goto failed_to_listen_mode;
-    // }
+    if(bind_and_listen_mode(&state, 9998)) {
+         goto failed_to_listen_mode;
+    }
 
     pthread_mutex_lock(&global_mutex);
     state.running = 1;
