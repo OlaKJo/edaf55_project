@@ -43,72 +43,7 @@ struct client{
 #endif
 };
 
-// MONITOR STUFF!--------------------------------------------------------------
 
-// struct camera_monitor {
-//   byte pictureData[BUFSIZE];
-//   int mode;
-//   bool pic_taken;
-//   bool pic_sent;
-// };
-//
-// struct camera_monitor * cam_mon;
-// pthread_mutex_t camera_mutex;
-//
-// void set_mode(int val) {
-//   pthread_mutex_lock(&camera_mutex);
-//   cam_mon->mode = val;
-//   pthread_mutex_unlock(&camera_mutex);
-// }
-//
-// bool set_pic_taken(bool val) {
-//   pthread_mutex_lock(&camera_mutex);
-//   cam_mon->pic_taken = val;
-//   pthread_mutex_unlock(&camera_mutex);
-//   return cam_mon->pic_taken;
-// }
-//
-// bool set_pic_sent(bool val) {
-//   pthread_mutex_lock(&camera_mutex);
-//   cam_mon->pic_sent = val;
-//   pthread_mutex_unlock(&camera_mutex);
-//   return cam_mon->pic_sent;
-// }
-//
-// void get_pic(byte * pic_copy) {
-//   pthread_mutex_lock(&camera_mutex);
-//   memcpy(pic_copy, cam_mon->pictureData, BUFSIZE);
-//   pthread_mutex_unlock(&camera_mutex);
-// }
-//
-// void save_pic(byte * pic) {
-//   pthread_mutex_lock(&camera_mutex);
-//   memcpy(cam_mon->pictureData, pic, BUFSIZE);
-//   pthread_mutex_unlock(&camera_mutex);
-// }
-//
-// int get_mode(void) {
-//   pthread_mutex_lock(&camera_mutex);
-//   int current_mode = cam_mon->mode;
-//   pthread_mutex_unlock(&camera_mutex);
-//   return current_mode;
-// }
-//
-// bool get_pic_taken(void) {
-//   pthread_mutex_lock(&camera_mutex);
-//   bool current_pic_taken = cam_mon->pic_taken;
-//   pthread_mutex_unlock(&camera_mutex);
-//   return current_pic_taken;
-// }
-//
-// bool get_pic_sent(void) {
-//   pthread_mutex_lock(&camera_mutex);
-//   bool current_pic_sent = cam_mon->pic_sent;
-//   pthread_mutex_unlock(&camera_mutex);
-//   return current_pic_sent;
-// }
-
-// END MONITOR STUFF!----------------------------------------------------------
 
 struct global_state {
     int listenfd;
@@ -590,10 +525,7 @@ int create_socket(struct global_state* state)
     return 0;
 }
 
-/* bind state->listenfd to port and listen
- * returns 0 on success
- */
-int bind_and_listen(struct global_state* state, int port)
+int bind_and_listen(int * member, int port)
 {
     struct sockaddr_in serv_addr;
 
@@ -602,40 +534,19 @@ int bind_and_listen(struct global_state* state, int port)
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(port);
 
-    if( bind(state->listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr))) {
-        perror("bind listenfd");
+    if( bind(*member, (struct sockaddr*)&serv_addr, sizeof(serv_addr))) {
+        perror("bind fd");
         return errno;
     }
 
-    if(listen(state->listenfd, 10)){
-        perror("listen listenfd");
-        return errno;
-    }
-
-    return 0;
-}
-
-int bind_and_listen_mode(struct global_state* state, int port)
-{
-    struct sockaddr_in serv_addr;
-
-    memset(&serv_addr, 0, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    serv_addr.sin_port = htons(port);
-
-    if( bind(state->modefd, (struct sockaddr*)&serv_addr, sizeof(serv_addr))) {
-        perror("bind modefd");
-        return errno;
-    }
-
-    if(listen(state->modefd, 10)){
-        perror("listen modefd");
+    if(listen(*member, 10)){
+        perror("listen fd");
         return errno;
     }
 
     return 0;
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -649,17 +560,18 @@ int main(int argc, char *argv[])
     // bool check_pic_sent = get_pic_sent();
     // check_pic_sent = set_pic_sent(false);
 
-    int port;
+    int port1 = 9999;
+    int port2 = 9998;
     struct global_state state;
     int result=0;
 
     if(argc==2) {
         printf("interpreting %s as port number\n", argv[1]);
-        port = atoi(argv[1]);
+        port1 = atoi(argv[1]);
     } else {
-        port = 9999;
+        port1 = 9999;
     }
-    printf("starting on port %d\n", port);
+    printf("starting on port %d\n", port1);
 
     init_global_state(&state);
 
@@ -667,12 +579,12 @@ int main(int argc, char *argv[])
         goto no_server_socket;
     }
 
-    if(bind_and_listen(&state, port)) {
-        goto failed_to_listen;
+    if(bind_and_listen(&(state.listenfd), port1)) {
+          goto failed_to_listen;
     }
 
-    if(bind_and_listen_mode(&state, 9998)) {
-         goto failed_to_listen_mode;
+    if(bind_and_listen(&(state.modefd), port2)) {
+          goto failed_to_listen_mode;
     }
 
     pthread_mutex_lock(&global_mutex);
