@@ -4,8 +4,6 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -34,10 +32,10 @@ public class SwingGui extends javax.swing.JFrame {
 	private JRadioButton movieRadioButton;
 	private JCheckBox syncCheckBox;
 	private JLabel syncLabel;
-	private ImageIcon imageIcon1, imageIcon2;
 
 	private boolean newInput;
 	private int mode, syncMode;
+	private GroupLayout layout;
 
 	public void StartGui() {
 		try {
@@ -79,9 +77,6 @@ public class SwingGui extends javax.swing.JFrame {
 			e.printStackTrace();
 		}
 
-		imageIcon1 = new ImageIcon(img);
-		imageIcon2 = new ImageIcon(img);
-
 		delayLabel1 = new JLabel();
 		syncCheckBox = new JCheckBox();
 		autoRadioButton = new JRadioButton();
@@ -90,8 +85,8 @@ public class SwingGui extends javax.swing.JFrame {
 		movieRadioButton = new JRadioButton();
 		syncLabel = new JLabel();
 		delayLabel2 = new JLabel();
-		image1 = new JLabel(imageIcon1);
-		image2 = new JLabel(imageIcon2);
+		image1 = new JLabel(new ImageIcon(img));
+		image2 = new JLabel(new ImageIcon(img));
 
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -135,7 +130,7 @@ public class SwingGui extends javax.swing.JFrame {
 	}
 
 	private void generateLayout() {
-		GroupLayout layout = new GroupLayout(getContentPane());
+		layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addGroup(layout.createSequentialGroup().addContainerGap()
@@ -186,7 +181,7 @@ public class SwingGui extends javax.swing.JFrame {
 		label.setIcon(new ImageIcon(image));
 
 		label.repaint();
-		
+
 	}
 
 	public void updateImage2(byte[] image) {
@@ -228,6 +223,13 @@ public class SwingGui extends javax.swing.JFrame {
 		movieRadioButton.setSelected(false);
 		newInput = true;
 		mode = ClientMonitor.MODE_AUTO;
+		BufferedImage img = null;
+		try {
+			img = ImageIO.read(new File("./UML Network.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		image1.setIcon(new ImageIcon(img));
 		notifyAll();
 	}
 
