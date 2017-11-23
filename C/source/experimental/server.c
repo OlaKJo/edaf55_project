@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 
-#define USE_CAMERA
+
 
 // some diagnostic printouts
 // #define INFO
@@ -25,20 +25,13 @@
 // the strncasecmp function is not in the ISO C standard
 // #define USE_POSIX_FUNCTION
 
-#ifdef USE_CAMERA
-#include "camera.h"
-#endif
-
 #ifndef MOTION_PORT
 #define MOTION_PORT 9090
 #endif
 
 struct client{
-    int  connfd;
-    int  connmodefd;
     byte sendBuff[BUFSIZE];
 #ifdef USE_CAMERA
-    camera* cam;
     byte* frame_data;
 #endif
 };
@@ -64,8 +57,8 @@ struct global_state {
 
 
 int client_write_string(struct client* client);
-int client_write_n(struct client* client, size_t n);
-void* serve_client(void *ctxt);
+int client_write_n(byte* pic_packet, size_t n);
+void* take_picture_task(void *ctxt);
 void server_quit(struct global_state* s);
 void signal_to_bg_task();
 int is_running(struct global_state* state);
@@ -112,28 +105,58 @@ void close_camera(struct global_state* state)
  *
  * returns size of entire packet, or -1 if frame too large
  */
-ssize_t setup_packet(struct client* client, uint64_t time_stamp, uint32_t frame_sz)
+ssize_t setup_packet(byte * pic_packet, uint64_t time_stamp, uint32_t frame_sz)
 {
-    size_t header_size;
+    size_t header_size = 10;
     //snprintf(client->sendBuff, sizeof(client->sendBuff),"%d", frame_sz);
     //memset(client->sendBuff, '1', 3);
-    memcpy(client->sendBuff, &time_stamp, 8);
-    memcpy(client->sendBuff+8, &frame_sz, 2);
-    header_size = 10;
-    if(header_size + frame_sz > sizeof(client->sendBuff)) {
-      return -1;
-    }
-    client->frame_data = client->sendBuff + header_size;
-#ifdef DEBUG
-    printf("Header size = " FORMAT_FOR_SIZE_T "\n", header_size);
-#endif
+    memcpy(pic_packet, &time_stamp, 8);
+    memcpy(pic_packet+8, &frame_sz, 2);
+    // if(header_size + frame_sz > sizeof(pic_packet)) {
+    //   return -1;
+    // }
+// #ifdef DEBUG
+//     printf("Header size = " FORMAT_FOR_SIZE_T "\n", header_size);
+// #endif
     return header_size+frame_sz;
-}
+// }
 
 /* send packet with frame
  * returns 0 on success
  */
+
+ }
+
 int client_send_frame(struct client* client, frame* fr)
+{
+    // this should really be a compile-time check, but that is complicated
+#ifndef DISABLE_SANITY_CHECKS
+    if(sizeof(size_t) != sizeof(uint32_t)) {
+        printf("sizeof(size_t)=%d, sizeof(uint32_t)=%d\n", sizeof(size_t), sizeof(uint32_t));
+        printf("Not sending frame, size sanity check failed\n");
+        return 2;
+    }
+#endif
+
+    byte pic_packet[BUFSIZE];
+
+    int result;
+    get_packet(pic_packet);
+
+    ssize_t packet_sz = get_packet_size();
+
+    int written=client_write_n(pic_packet, packet_sz);
+
+    if(written != packet_sz) {
+      printf("WARNING! packet_sz=" FORMAT_FOR_SIZE_T ", written=%d\n", packet_sz, written);
+      result = 3;
+    } else {
+      result = 0;
+    }
+    return result;
+}
+
+int client_save_frame(struct client* client, frame* fr)
 {
     // this should really be a compile-time check, but that is complicated
 #ifndef DISABLE_SANITY_CHECKS
@@ -146,32 +169,27 @@ int client_send_frame(struct client* client, frame* fr)
 
     size_t frame_sz = get_frame_size(fr);
     size_t time_stamp = get_frame_timestamp(fr);
-    save_pic(get_frame_bytes(fr));
-    byte data[BUFSIZE];
-    int result;
+    byte * data = get_frame_bytes(fr);
 
-//printf("camera_get_frame: ts=%llu\n", get_frame_timestamp(fr));
-    ssize_t packet_sz = setup_packet(client, time_stamp, frame_sz);
+    byte pic_packet[BUFSIZE];
+
+    ssize_t packet_sz = setup_packet(pic_packet, time_stamp, frame_sz);
+    save_packet_size(packet_sz);
+
+    save_packet(pic_packet);
+
+    int result;
 
     if(packet_sz < 0) {
         printf("Frame too big for send buffer(" FORMAT_FOR_SIZE_T " > " FORMAT_FOR_SIZE_T "), skipping.\n", frame_sz, sizeof(client->sendBuff));
         result = 1;
     } else {
+        result = 0;
         int written;
 #ifdef DEBUG
         printf("encode size:" FORMAT_FOR_SIZE_T "\n",  frame_sz);
         printf("sizeof(size_t)=" FORMAT_FOR_SIZE_T ", sizeof(uint32_t)=" FORMAT_FOR_SIZE_T "\n", sizeof(size_t), sizeof(uint32_t));
 #endif
-        get_pic(data);
-        memcpy(client->frame_data, data, frame_sz);
-
-        written=client_write_n(client, packet_sz);
-        if(written != packet_sz) {
-          printf("WARNING! packet_sz=" FORMAT_FOR_SIZE_T ", written=%d\n", packet_sz, written);
-          result = 3;
-        } else {
-          result = 0;
-        }
     }
     return result;
 }
@@ -182,11 +200,14 @@ int client_send_frame(struct client* client, frame* fr)
 int try_get_frame(struct client* client)
 {
     int result=-1;
-    frame *fr = fr = camera_get_frame(client->cam);
+    frame *fr = fr = camera_get_frame(cam_mon->cam);
 
     if(fr) {
+        if((result = client_save_frame(client, fr))) {
+          printf("Warning: client_save_frame returned %d\n", result);
+        }
         if((result = client_send_frame(client, fr))) {
-          printf("Warning: client_send_frame returned %d\n", result);
+          printf("Warning: client_save_frame returned %d\n", result);
         }
         frame_free(fr);
     } else {
@@ -200,7 +221,7 @@ int try_get_frame(struct client* client)
 
 int client_write_string(struct client* client)
 {
-  return write_string(client->connfd, client->sendBuff);
+  return write_string(cam_mon->connfd, client->sendBuff);
 }
 
 /*
@@ -209,30 +230,30 @@ int client_write_string(struct client* client)
  * Note: an error occurs if the web browser closes the connection
  *   (might happen when reloading too frequently)
  */
-int client_write_n(struct client* client, size_t n)
+int client_write_n(byte * send_data, size_t n)
 {
-    return write_n(client->connfd, client->sendBuff,n);
+    return write_n(cam_mon->connfd, send_data,n);
 }
 
-static void send_internal_error(struct client* client,const char* msg)
-{
-    snprintf(client->sendBuff, sizeof(client->sendBuff),
-	     "HTTP/1.0 500 Internal Error\nContent-Length: " FORMAT_FOR_SIZE_T "\nContent-Type: text/plain\n\n%s",
-	     strlen(msg), msg);
-    client_write_string(client);
-}
+// static void send_internal_error(struct client* client,const char* msg)
+// {
+//     snprintf(client->sendBuff, sizeof(client->sendBuff),
+// 	     "HTTP/1.0 500 Internal Error\nContent-Length: " FORMAT_FOR_SIZE_T "\nContent-Type: text/plain\n\n%s",
+// 	     strlen(msg), msg);
+//     client_write_string(client);
+// }
 
 /* The function for a thread that processes a single client request.
  * The client struct pointer is passed as void* due to the pthreads API
 */
-void* serve_client(void *ctxt)
+void* take_picture_task(void *ctxt)
 {
     char buf[1024] = {};
     struct client* client = ctxt;
     while(1)
     {
       memset(client->sendBuff, 0, sizeof(client->sendBuff));
-      //int rres = read(client->connfd, buf, 1024);
+      //int rres = read(cam_mon->connfd, buf, 1024);
       sleep(1);
       set_mode(0);
     //   if(rres < 0) {
@@ -248,9 +269,9 @@ void* serve_client(void *ctxt)
       //if(hres == 0) {
   #ifdef USE_CAMERA
   	    int cres=0;
-              if( !client->cam || (cres=try_get_frame(client))) {
+              if( !cam_mon->cam || (cres=try_get_frame(client))) {
                   printf("ERROR getting frame from camera: %d\n",cres);
-  		send_internal_error(client, "Error getting frame from camera\n");
+  		//send_internal_error(client, "Error getting frame from camera\n");
               }
   #else
           snprintf(client->sendBuff, sizeof(client->sendBuff), "Hello...\n");
@@ -259,7 +280,7 @@ void* serve_client(void *ctxt)
 
       //}
     }
-    return (void*) (intptr_t) close(client->connfd);
+    return (void*) (intptr_t) close(cam_mon->connfd);
 }
 
 /* The function for a thread that processes a single client request.
@@ -272,7 +293,7 @@ void* update_mode_task(void *ctxt)
     while(1)
     {
       printf("OBS! entered update_mode_task\n");
-      int rres = read(client->connmodefd, buf, 1);
+      int rres = read(cam_mon->connmodefd, buf, 1);
       if(rres < 0) {
           perror("update_mode_task: read");
   	return (void*) (intptr_t) errno;
@@ -282,9 +303,9 @@ void* update_mode_task(void *ctxt)
       printf("buf[%s]\n", buf);
   #endif
       set_mode(buf[0]);
-      printf("mode update received!\n");
+      printf("mode update received! : %d and buffer was: %d\n",rres, buf[0]);
     }
-    return (void*) (intptr_t) close(client->connmodefd);
+    return (void*) (intptr_t) close(cam_mon->connmodefd);
 }
 
 /* signal the global condition variable
@@ -338,11 +359,11 @@ int try_accept(struct global_state* state, struct client* client)
 	printf("Error opening camera\n");
 	return 1;
     }
-    client->cam = state->cam;
-    client->connfd = accept(state->listenfd, (struct sockaddr*)NULL, NULL);
-    client->connmodefd = accept(state->modefd, (struct sockaddr*)NULL, NULL);
+    cam_mon->cam = state->cam;
+    cam_mon->connfd = accept(state->listenfd, (struct sockaddr*)NULL, NULL);
+    cam_mon->connmodefd = accept(state->modefd, (struct sockaddr*)NULL, NULL);
 
-    if(client->connfd < 0) {
+    if(cam_mon->connfd < 0) {
         result = errno;
     } else {
 #ifdef INFO
@@ -353,13 +374,13 @@ int try_accept(struct global_state* state, struct client* client)
 	// 2. Not blocking the user interface while serving client
 	// 3. Prepare for serving multiple clients concurrently
         // 4. The AXIS software requires capture to be run outside the main thread
-        if (pthread_create(&state->client_thread, 0, serve_client, client) ||
+        if (pthread_create(&state->client_thread, 0, take_picture_task, client) ||
             pthread_create(&state->update_mode_thread, 0, update_mode_task, client)) {
             printf("Error pthread_create()\n");
             perror("creating");
             result = errno;
         } else {
-            printf("TRY_ACCEPT! serve_client run in try_accept\n");
+            printf("TRY_ACCEPT! take_picture_task run in try_accept\n");
             void* status;
             if(pthread_join(state->client_thread, &status) ||
                pthread_join(state->update_mode_thread, &status)){
@@ -430,8 +451,8 @@ static void join_bg_thread(pthread_t* bg_thread, const char* msg)
 
 static void client_init(struct client* client)
 {
-    client->cam=NULL;
-    client->connfd=-1;
+    cam_mon->cam=NULL;
+    cam_mon->connfd=-1;
 }
 int serve_clients(struct global_state* state)
 {

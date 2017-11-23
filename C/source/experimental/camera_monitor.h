@@ -10,6 +10,12 @@
 #include <unistd.h>
 #include <stdbool.h>
 
+#define USE_CAMERA
+
+#ifdef USE_CAMERA
+#include "camera.h"
+#endif
+
 #define MOVIE_MODE 1
 #define IDLE_MODE 0
 
@@ -17,10 +23,17 @@
 typedef char byte;
 
 struct camera_monitor {
-  byte pictureData[BUFSIZE];
+  byte pic_packet[BUFSIZE];
   int mode;
   bool pic_taken;
   bool pic_sent;
+  int  connfd;
+  int  connmodefd;
+  ssize_t packet_sz;
+  #ifdef USE_CAMERA
+      camera * cam;
+      byte* frame_data;
+  #endif
 };
 
 struct camera_monitor * cam_mon;
@@ -35,12 +48,16 @@ bool set_pic_taken(bool);
 
 bool set_pic_sent(bool);
 
-void get_pic(byte *);
+void get_packet(byte *);
 
-void save_pic(byte *);
+void save_packet(byte *);
 
 int get_mode(void);
 
 bool get_pic_taken(void);
 
 bool get_pic_sent(void);
+
+void save_packet_size(ssize_t);
+
+ssize_t get_packet_size(void);

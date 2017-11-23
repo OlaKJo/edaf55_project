@@ -11,10 +11,6 @@
 #include <unistd.h>
 #include <stdbool.h>
 
-#ifdef USE_CAMERA
-#include "camera.h"
-#endif
-
 void init(void) {
   cam_mon = malloc(sizeof(*cam_mon));
   cam_mon->pic_sent = false;
@@ -42,15 +38,15 @@ bool set_pic_sent(bool val) {
   return cam_mon->pic_sent;
 }
 
-void get_pic(byte * pic_copy) {
+void get_packet(byte * pic_copy) {
   pthread_mutex_lock(&camera_mutex);
-  memcpy(pic_copy, cam_mon->pictureData, BUFSIZE);
+  memcpy(pic_copy, cam_mon->pic_packet, BUFSIZE);
   pthread_mutex_unlock(&camera_mutex);
 }
 
-void save_pic(byte * pic) {
+void save_packet(byte * pic) {
   pthread_mutex_lock(&camera_mutex);
-  memcpy(cam_mon->pictureData, pic, BUFSIZE);
+  memcpy(cam_mon->pic_packet, pic, BUFSIZE);
   pthread_mutex_unlock(&camera_mutex);
 }
 
@@ -73,4 +69,17 @@ bool get_pic_sent(void) {
   bool current_pic_sent = cam_mon->pic_sent;
   pthread_mutex_unlock(&camera_mutex);
   return current_pic_sent;
+}
+
+void save_packet_size(ssize_t packet_sz) {
+  pthread_mutex_lock(&camera_mutex);
+  cam_mon->packet_sz = packet_sz;
+  pthread_mutex_unlock(&camera_mutex);
+}
+
+ssize_t get_packet_size(void) {
+  pthread_mutex_lock(&camera_mutex);
+  ssize_t size = cam_mon->packet_sz;
+  pthread_mutex_unlock(&camera_mutex);
+  return size;
 }
