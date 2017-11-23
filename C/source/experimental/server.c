@@ -17,9 +17,10 @@
 
 // some diagnostic printouts
 // #define INFO
+#define DEBUG 1
 
 // more diagnostic printouts
-// #undef DEBUG
+#undef DEBUG
 
 // the strncasecmp function is not in the ISO C standard
 // #define USE_POSIX_FUNCTION
@@ -34,6 +35,7 @@
 
 struct client{
     int  connfd;
+    int  connmodefd;
     byte sendBuff[BUFSIZE];
 #ifdef USE_CAMERA
     camera* cam;
@@ -110,6 +112,7 @@ struct client{
 
 struct global_state {
     int listenfd;
+    int modefd;
     int running;
     int quit;
     pthread_t main_thread;
@@ -119,7 +122,6 @@ struct global_state {
     pthread_t update_mode_thread;
     struct pollfd pfd;
     int motionfd;
-    int modefd;
 #ifdef USE_CAMERA
     camera* cam;
 #endif
@@ -137,7 +139,6 @@ int is_running(struct global_state* state);
 
 #define ERR_OPEN_STREAM 1
 #define ERR_GET_FRAME 2
-#define DEBUG 1
 
 struct client;
 
@@ -214,7 +215,7 @@ int client_send_frame(struct client* client, frame* fr)
     byte data[BUFSIZE];
     int result;
 
-printf("camera_get_frame: ts=%llu\n", get_frame_timestamp(fr));
+//printf("camera_get_frame: ts=%llu\n", get_frame_timestamp(fr));
     ssize_t packet_sz = setup_packet(client, time_stamp, frame_sz);
 
     if(packet_sz < 0) {
@@ -335,7 +336,8 @@ void* update_mode_task(void *ctxt)
     struct client* client = ctxt;
     while(1)
     {
-      int rres = read(client->connfd, buf, 1);
+      printf("OBS! entered update_mode_task\n");
+      int rres = read(client->connmodefd, buf, 1);
       if(rres < 0) {
           perror("update_mode_task: read");
   	return (void*) (intptr_t) errno;
@@ -347,7 +349,7 @@ void* update_mode_task(void *ctxt)
       set_mode(buf[0]);
       printf("mode update received!\n");
     }
-    return (void*) (intptr_t) close(client->connfd);
+    return (void*) (intptr_t) close(client->connmodefd);
 }
 
 /* signal the global condition variable
@@ -403,6 +405,8 @@ int try_accept(struct global_state* state, struct client* client)
     }
     client->cam = state->cam;
     client->connfd = accept(state->listenfd, (struct sockaddr*)NULL, NULL);
+    client->connmodefd = accept(state->modefd, (struct sockaddr*)NULL, NULL);
+
     if(client->connfd < 0) {
         result = errno;
     } else {
@@ -414,14 +418,16 @@ int try_accept(struct global_state* state, struct client* client)
 	// 2. Not blocking the user interface while serving client
 	// 3. Prepare for serving multiple clients concurrently
         // 4. The AXIS software requires capture to be run outside the main thread
-        if (pthread_create(&state->client_thread, 0, serve_client, client)) {
+        if (pthread_create(&state->client_thread, 0, serve_client, client) ||
+            pthread_create(&state->update_mode_thread, 0, update_mode_task, client)) {
             printf("Error pthread_create()\n");
             perror("creating");
             result = errno;
         } else {
-            printf("serve_client run in try_accept");
+            printf("TRY_ACCEPT! serve_client run in try_accept\n");
             void* status;
-            if(pthread_join(state->client_thread, &status)){
+            if(pthread_join(state->client_thread, &status) ||
+               pthread_join(state->update_mode_thread, &status)){
                 perror("join");
                 result = errno;
             } else {
@@ -431,22 +437,22 @@ int try_accept(struct global_state* state, struct client* client)
             }
         }
 
-        if (pthread_create(&state->update_mode_thread, 0, update_mode_task, client)) {
-            printf("Error pthread_create()\n");
-            perror("creating");
-            result = errno;
-        } else {
-          printf("update_mode_task run in try_accept");
-            void* status;
-            if(pthread_join(state->client_thread, &status)){
-                perror("join");
-                result = errno;
-            } else {
-#ifdef DEBUG
-		printf("Join: status = %d\n", (int)(intptr_t) status);
-#endif
-            }
-        }
+//         if (pthread_create(&state->update_mode_thread, 0, update_mode_task, client)) {
+//             printf("Error pthread_create()\n");
+//             perror("creating");
+//             result = errno;
+//         } else {
+//           printf("TRY_ACCEPT! update_mode_task run in try_accept\n");
+//             void* status;
+//             if(pthread_join(state->client_thread, &status)){
+//                 perror("join");
+//                 result = errno;
+//             } else {
+// #ifdef DEBUG
+// 		printf("Join: status = %d\n", (int)(intptr_t) status);
+// #endif
+//             }
+//         }
 
     }
     return result;

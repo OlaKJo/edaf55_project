@@ -5,7 +5,7 @@
 #include <time.h>
 #include "fakecapture.h"
 
-
+#undef INFO
 // compile-time options:
 // prefereably, set using -D<MACRONAME> in the Makefile
 // or on the command line
