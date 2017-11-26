@@ -5,7 +5,7 @@ public class Display extends Thread {
 	private ClientMonitor clientMonitor;
 	private DisplayMonitor displayMonitor;
 	private int camNbr;
-	private boolean oldSyncMode;
+	private boolean oldSyncMode, synced;
 	
 	public Display(DisplayMonitor displayMonitor, ClientMonitor clientMonitor, int CAM_NBR) {
 		this.displayMonitor = displayMonitor;
@@ -24,7 +24,11 @@ public class Display extends Thread {
 				displayMonitor.updatePicture2(pic);
 			}
 			
-			if(clientMonitor.getSyncMode() != oldSyncMode) displayMonitor.setSyncLabel(true); 
+			synced = clientMonitor.getSyncMode();
+			if(synced != oldSyncMode) {
+				displayMonitor.setSyncLabel(synced);
+				oldSyncMode = synced;
+			}
 		}
 	}
 	
