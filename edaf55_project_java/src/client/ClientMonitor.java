@@ -20,7 +20,7 @@ public class ClientMonitor {
 
 		delayedFrames = 0;
 		this.forceSync = false;
-		synced = false;
+		synced = true;
 		mode = MODE_AUTO;
 		modeAuto = true;
 		modeChanged = false;
@@ -143,6 +143,10 @@ public class ClientMonitor {
 		} else {
 			return false;
 		}
+	}
+
+	public boolean getSyncMode() {
+		return synced;
 	}
 
 }

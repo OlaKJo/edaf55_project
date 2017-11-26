@@ -26,5 +26,9 @@ public class DisplayMonitor {
 		gui.updateImage1(pic_2);
 		timeStampPic2 = arrivalTime;
 	}
+	
+	public synchronized void setSyncLabel(boolean synced) {
+		gui.setSyncLabel(synced);
+	}
 
 }
