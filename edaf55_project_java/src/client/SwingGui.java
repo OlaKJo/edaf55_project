@@ -36,6 +36,8 @@ public class SwingGui extends javax.swing.JFrame {
 	private boolean newInput;
 	private int mode, syncMode;
 	private GroupLayout layout;
+	
+	public static final int MODE_ASYNC = 1, MODE_SYNC = 2;
 
 	public void StartGui() {
 		try {
@@ -251,7 +253,8 @@ public class SwingGui extends javax.swing.JFrame {
 
 	private void syncCheckBoxActionPerformed(ActionEvent evt) {
 		newInput = true;
-		syncMode = syncCheckBox.isSelected() ? ClientMonitor.MODE_ASYNC : ClientMonitor.MODE_SYNC;
+		syncMode = syncCheckBox.isSelected() ? MODE_SYNC : MODE_ASYNC;
+		notifyAll();
 	}
 
 }

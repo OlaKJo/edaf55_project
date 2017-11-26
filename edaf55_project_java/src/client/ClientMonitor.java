@@ -3,7 +3,7 @@ package client;
 public class ClientMonitor {
 
 	private int mode;
-	private boolean sync;
+	private boolean forceSync, synced;
 	private byte[] picBuffer1, picBuffer2;
 	private int delayedFrames;
 	private long timeStampPic1, timeStampPic2;
@@ -13,13 +13,16 @@ public class ClientMonitor {
 	// Number of delayed frames tolerated before mode switch
 	private final int delayedFramesTolerance = 10;
 	private final long syncToleranceMillis = 200;
-	public static final int MODE_AUTO = 0, MODE_IDLE = 1, MODE_MOVIE = 2, MODE_SYNC = 4, MODE_ASYNC = 5;
+	public static final int MODE_AUTO = 0, MODE_IDLE = 1, MODE_MOVIE = 2;
+	private boolean modeAuto;
 
 	public ClientMonitor() {
 
 		delayedFrames = 0;
-		this.sync = false;
+		this.forceSync = false;
+		synced = false;
 		mode = MODE_AUTO;
+		modeAuto = true;
 		modeChanged = false;
 		pic1Available = false;
 		pic2Available = false;
@@ -27,17 +30,21 @@ public class ClientMonitor {
 	}
 
 	public synchronized void setMode(int mode) {
-
-		this.mode = mode;
-		modeChanged = true;
-		notifyAll();
+		if(mode == MODE_AUTO) {
+			modeAuto = true;
+		}
+		else {
+			this.mode = mode;
+			modeChanged = true;
+			notifyAll();	
+		}
 	}
 
 	public synchronized void setSync(boolean sync) {
 
-		if (this.sync == false && sync == true)
-			delayedFrames = -1;// Ignore first frame delay
-		this.sync = sync;
+		if(sync) {
+			this.forceSync = true;
+		}
 
 		modeChanged = true;
 		notifyAll();
@@ -56,10 +63,10 @@ public class ClientMonitor {
 			pic2Available = true;
 		}
 		notifyAll();
-		if (mode == MODE_AUTO && sync == false) {
+		if (modeAuto && synced) {
 			syncCheck();
 		}
-		else if(mode == MODE_AUTO && sync == false){
+		else if(modeAuto && !synced){
 			asyncCheck();
 		}
 	}
@@ -122,6 +129,7 @@ public class ClientMonitor {
 		}
 	}
 
+	//TODO
 	public synchronized boolean getModeUpdate() {
 		try {
 			while (!modeChanged)
