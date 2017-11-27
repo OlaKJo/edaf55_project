@@ -15,7 +15,24 @@ void init(void) {
   cam_mon = malloc(sizeof(*cam_mon));
   cam_mon->pic_sent = true;
   cam_mon->pic_taken = false;
+  cam_mon->pic_take_send = 0;
   cam_mon->mode = IDLE_MODE;
+}
+
+int get_pic_take_send(void) {
+  pthread_mutex_lock(&camera_mutex);
+  int current = cam_mon->pic_take_send;
+  pthread_mutex_unlock(&camera_mutex);
+  return current;
+}
+
+void flip_pic_take_send(void) {
+  pthread_mutex_lock(&camera_mutex);
+  if(cam_mon->pic_take_send == 1)
+    cam_mon->pic_take_send = 0;
+  else
+    cam_mon->pic_take_send = 1;
+  pthread_mutex_unlock(&camera_mutex);
 }
 
 void set_mode(int val) {

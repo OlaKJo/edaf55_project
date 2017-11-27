@@ -272,9 +272,9 @@ void* take_picture_task(void *ctxt)
 
         //mutex logic
         pthread_mutex_lock(&global_mutex);
-        while(!get_pic_sent())
+        while(get_pic_take_send() != TAKE_PIC_STATE)
         {
-          printf("take_picture_task: get_pic_sent: %d   get_pic_taken: %d\n", get_pic_sent(), get_pic_taken());
+          printf("take_picture_task: pic_take_send: %d\n", get_pic_take_send());
           pthread_cond_wait(&global_cond, &global_mutex);
         }
         //mutex logic
@@ -306,10 +306,9 @@ void* take_picture_task(void *ctxt)
   #endif
 
   //mutex logic
-  set_pic_taken(true);
-  set_pic_sent(false);
+  flip_pic_take_send();
   pthread_mutex_unlock(&global_mutex);
-  pthread_cond_signal(&global_cond);
+  pthread_cond_broadcast(&global_cond);
   //mutex logic
 
   }
@@ -327,9 +326,9 @@ void* send_picture_task(void *ctxt)
 
        //mutex logic
        pthread_mutex_lock(&global_mutex);
-       while(!get_pic_taken())
+       while(get_pic_take_send() != SEND_PIC_STATE)
        {
-         printf("send_picture_task: get_pic_sent: %d   get_pic_taken: %d\n", get_pic_sent(), get_pic_taken());
+         printf("send_picture_task: pic_take_send: %d\n", get_pic_take_send());
          pthread_cond_wait(&global_cond, &global_mutex);
        }
        //mutex logic
@@ -360,10 +359,9 @@ void* send_picture_task(void *ctxt)
   #endif
 
     //mutex logic
-    set_pic_sent(true);
-    set_pic_taken(false);
+    flip_pic_take_send();
     pthread_mutex_unlock(&global_mutex);
-    pthread_cond_signal(&global_cond);
+    pthread_cond_broadcast(&global_cond);
     //mutex logic
 
     }
