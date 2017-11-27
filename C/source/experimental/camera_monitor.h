@@ -19,6 +19,9 @@
 #define MOVIE_MODE 1
 #define IDLE_MODE 0
 
+#define SEND_PIC_STATE 1
+#define TAKE_PIC_STATE 0
+
 #define BUFSIZE 50000
 typedef char byte;
 
@@ -27,6 +30,7 @@ struct camera_monitor {
   int mode;
   bool pic_taken;
   bool pic_sent;
+  int pic_take_send;
   int  connfd;
   int  connmodefd;
   ssize_t packet_sz;
@@ -39,6 +43,10 @@ struct camera_monitor {
 struct camera_monitor * cam_mon;
 
 pthread_mutex_t camera_mutex;
+
+int get_pic_take_send(void);
+
+void flip_pic_take_send(void);
 
 void init(void);
 

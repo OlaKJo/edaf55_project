@@ -45,6 +45,7 @@ struct global_state {
     int quit;
     pthread_t main_thread;
     pthread_t client_thread;
+    pthread_t send_picture_thread;
     //pthread_t ui_thread;
     pthread_t bg_thread;
     pthread_t update_mode_thread;
@@ -59,6 +60,7 @@ struct global_state {
 int client_write_string(struct client* client);
 int client_write_n(byte* pic_packet, size_t n);
 void* take_picture_task(void *ctxt);
+void* send_picture_task(void *ctxt);
 void server_quit(struct global_state* s);
 void signal_to_bg_task();
 int is_running(struct global_state* state);
@@ -129,7 +131,7 @@ ssize_t setup_packet(byte * pic_packet, uint64_t time_stamp, uint32_t frame_sz, 
 
  }
 
-int client_send_frame(struct client* client, frame* fr)
+int client_send_frame(struct client* client)
 {
     // this should really be a compile-time check, but that is complicated
 #ifndef DISABLE_SANITY_CHECKS
@@ -199,8 +201,22 @@ int client_save_frame(struct client* client, frame* fr)
 /* get frame from camera and send to client
  * returns zero on success
  */
+int try_send_frame(struct client* client)
+{
+  printf("_______________TRY_SEND_FRAME\n");
+    int result=-1;
+
+    if((result = client_send_frame(client))) {
+      printf("Warning: client_save_frame returned %d\n", result);
+    }
+      return result;
+}
+#endif
+
+
 int try_get_frame(struct client* client)
 {
+  printf("_______________TRY_GET_FRAME\n");
     int result=-1;
     frame *fr = fr = camera_get_frame(cam_mon->cam);
 
@@ -208,16 +224,15 @@ int try_get_frame(struct client* client)
         if((result = client_save_frame(client, fr))) {
           printf("Warning: client_save_frame returned %d\n", result);
         }
-        if((result = client_send_frame(client, fr))) {
-          printf("Warning: client_save_frame returned %d\n", result);
-        }
+        // if((result = client_send_frame(client, fr))) {
+        //   printf("Warning: client_save_frame returned %d\n", result);
+        // }
         frame_free(fr);
     } else {
         return ERR_GET_FRAME;
     }
     return result;
 }
-#endif
 
 ////////////// Server stuff
 
@@ -250,14 +265,26 @@ int client_write_n(byte * send_data, size_t n)
 */
 void* take_picture_task(void *ctxt)
 {
+
     char buf[1024] = {};
     struct client* client = ctxt;
     while(1)
     {
+      printf("RUNNING: take_picture_task\n");
+
+        //mutex logic
+        pthread_mutex_lock(&global_mutex);
+        while(get_pic_take_send() != TAKE_PIC_STATE)
+        {
+          printf("take_picture_task: pic_take_send: %d\n", get_pic_take_send());
+          pthread_cond_wait(&global_cond, &global_mutex);
+        }
+        //mutex logic
+
       memset(client->sendBuff, 0, sizeof(client->sendBuff));
       //int rres = read(cam_mon->connfd, buf, 1024);
-      sleep(1);
-      set_mode(0);
+      //sleep(1);
+      //set_mode(0);
     //   if(rres < 0) {
     //       perror("motion_task: read");
   	// return (void*) (intptr_t) errno;
@@ -280,8 +307,67 @@ void* take_picture_task(void *ctxt)
   	client_write_string(client);
   #endif
 
-      //}
+  //mutex logic
+  flip_pic_take_send();
+  pthread_mutex_unlock(&global_mutex);
+  pthread_cond_broadcast(&global_cond);
+  //mutex logic
+
+  }
+
+    return (void*) (intptr_t) close(cam_mon->connfd);
+}
+
+void* send_picture_task(void *ctxt)
+{
+  //   char buf[1024] = {};
+     struct client* client = ctxt;
+     while(1)
+     {
+       printf("RUNNING: send_picture_task\n");
+
+       //mutex logic
+       pthread_mutex_lock(&global_mutex);
+       while(get_pic_take_send() != SEND_PIC_STATE)
+       {
+         printf("send_picture_task: pic_take_send: %d\n", get_pic_take_send());
+         pthread_cond_wait(&global_cond, &global_mutex);
+       }
+       //mutex logic
+  //     memset(client->sendBuff, 0, sizeof(client->sendBuff));
+  //     //int rres = read(cam_mon->connfd, buf, 1024);
+  //     sleep(1);
+  //     set_mode(0);
+  //   //   if(rres < 0) {
+  //   //       perror("motion_task: read");
+  // 	// return (void*) (intptr_t) errno;
+  //   //   }
+  // #ifdef DEBUG
+  //     //printf("read: rres = %d\n", rres);
+  //     printf("buf[%s]\n", buf);
+  // #endif
+  //     //int hres = parse_http_request(buf, 1024);
+  //     //int hres = 0;
+  //     //if(hres == 0) {
+  #ifdef USE_CAMERA
+  	    int cres=0;
+              if( !cam_mon->cam || (cres=try_send_frame(client))) {
+                  printf("ERROR getting frame from camera: %d\n",cres);
+  		//send_internal_error(client, "Error getting frame from camera\n");
+              }
+  #else
+          snprintf(client->sendBuff, sizeof(client->sendBuff), "Hello...\n");
+  	client_write_string(client);
+  #endif
+
+    //mutex logic
+    flip_pic_take_send();
+    pthread_mutex_unlock(&global_mutex);
+    pthread_cond_broadcast(&global_cond);
+    //mutex logic
+
     }
+
     return (void*) (intptr_t) close(cam_mon->connfd);
 }
 
@@ -291,7 +377,7 @@ void* take_picture_task(void *ctxt)
 void* update_mode_task(void *ctxt)
 {
     char buf[1] = {};
-    struct client* client = ctxt;
+    //struct client* client = ctxt;
     while(1)
     {
       printf("OBS! entered update_mode_task\n");
@@ -377,6 +463,7 @@ int try_accept(struct global_state* state, struct client* client)
 	// 3. Prepare for serving multiple clients concurrently
         // 4. The AXIS software requires capture to be run outside the main thread
         if (pthread_create(&state->client_thread, 0, take_picture_task, client) ||
+            pthread_create(&state->send_picture_thread, 0, send_picture_task, client) ||
             pthread_create(&state->update_mode_thread, 0, update_mode_task, client)) {
             printf("Error pthread_create()\n");
             perror("creating");
@@ -385,6 +472,7 @@ int try_accept(struct global_state* state, struct client* client)
             printf("TRY_ACCEPT! take_picture_task run in try_accept\n");
             void* status;
             if(pthread_join(state->client_thread, &status) ||
+               pthread_join(state->send_picture_thread, &status) ||
                pthread_join(state->update_mode_thread, &status)){
                 perror("join");
                 result = errno;
