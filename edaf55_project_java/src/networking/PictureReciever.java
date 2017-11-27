@@ -64,6 +64,10 @@ public class PictureReciever extends Thread {
 					byte[] imageData = new byte[pictureSize];
 					System.arraycopy(buffer, PicturePack.HEAD_SIZE, imageData, 0, pictureSize);
 					
+					for(int i = 0; i < 500; i++){
+						System.out.print(Byte.toString(buffer[i]) + " ");
+					}
+					
 					//put image in monitor
 					clientMonitor.putPicture(imageData, ts ,camNbr);
 
