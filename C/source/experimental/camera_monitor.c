@@ -13,7 +13,7 @@
 
 void init(void) {
   cam_mon = malloc(sizeof(*cam_mon));
-  cam_mon->pic_sent = false;
+  cam_mon->pic_sent = true;
   cam_mon->pic_taken = false;
   cam_mon->mode = IDLE_MODE;
 }
