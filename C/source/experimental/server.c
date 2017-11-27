@@ -105,7 +105,7 @@ void close_camera(struct global_state* state)
  *
  * returns size of entire packet, or -1 if frame too large
  */
-ssize_t setup_packet(byte * pic_packet, uint64_t time_stamp, uint32_t frame_sz)
+ssize_t setup_packet(byte * pic_packet, uint64_t time_stamp, uint32_t frame_sz, byte * data)
 {
     size_t header_size = 10;
     //snprintf(client->sendBuff, sizeof(client->sendBuff),"%d", frame_sz);

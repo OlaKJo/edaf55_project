@@ -1,0 +1,9 @@
+cd ./edaf55_project_java
+xterm -e java -jar Client.jar &
+
+cd ..
+C/source/experimental/make -f C/source/experimental/Makefile.fake
+cd ./C/source/experimental
+xterm -e ./fake_server 8002
+
+
