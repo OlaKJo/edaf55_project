@@ -4,9 +4,12 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +40,7 @@ public class SwingGui extends javax.swing.JFrame {
 	private boolean newInput;
 	private int mode, syncMode;
 	private GroupLayout layout;
+	private int onlyOnce = 0;
 	
 	public static final int MODE_ASYNC = 1, MODE_SYNC = 2;
 
@@ -181,6 +185,21 @@ public class SwingGui extends javax.swing.JFrame {
 	}
 
 	private void updateImage(byte[] img, JLabel label) {
+//		if(onlyOnce == 0) {
+//			InputStream bas = new ByteArrayInputStream(img);
+//			
+//			System.out.println("" + img.length);
+//			
+//			try {
+//				File f = new File("firstImage.jpg");
+//				BufferedImage bf = ImageIO.read(bas);
+//				//if (bf != null) 
+//				ImageIO.write(bf, "jpg", f);
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		onlyOnce = 1;
 		label.setIcon(new ImageIcon(img));
 	}
 
@@ -223,13 +242,6 @@ public class SwingGui extends javax.swing.JFrame {
 		movieRadioButton.setSelected(false);
 		newInput = true;
 		mode = ClientMonitor.MODE_AUTO;
-		BufferedImage img = null;
-		try {
-			img = ImageIO.read(new File("./UML Network.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		image1.setIcon(new ImageIcon(img));
 	}
 
 	private void idleRadioButtonActionPerformed(ActionEvent evt) {
@@ -251,24 +263,24 @@ public class SwingGui extends javax.swing.JFrame {
 		syncMode = syncCheckBox.isSelected() ? MODE_SYNC : MODE_ASYNC;
 	}
 	
-	public static void main (String[] args) {
-		SwingGui gui = new SwingGui();
-		gui.setVisible(true);
-		BufferedImage img = null;
-		try {
-			img = ImageIO.read(new File("./UML Network.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		try {
-			ImageIO.write(img, "png", baos);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		byte[] imgarray = baos.toByteArray();
-		
-		gui.updateImage1(imgarray);
-	}
+//	public static void main (String[] args) {
+//		SwingGui gui = new SwingGui();
+//		gui.setVisible(true);
+//		BufferedImage img = null;
+//		try {
+//			img = ImageIO.read(new File("./UML Network.png"));
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//		try {
+//			ImageIO.write(img, "png", baos);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		byte[] imgarray = baos.toByteArray();
+//		
+//		gui.updateImage1(imgarray);
+//	}
 
 }
