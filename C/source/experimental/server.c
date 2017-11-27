@@ -112,6 +112,8 @@ ssize_t setup_packet(byte * pic_packet, uint64_t time_stamp, uint32_t frame_sz)
     //memset(client->sendBuff, '1', 3);
     memcpy(pic_packet, &time_stamp, 8);
     memcpy(pic_packet+8, &frame_sz, 2);
+    memcpy(pic_packet+header_size, data, frame_sz);
+
     // if(header_size + frame_sz > sizeof(pic_packet)) {
     //   return -1;
     // }
@@ -173,7 +175,7 @@ int client_save_frame(struct client* client, frame* fr)
 
     byte pic_packet[BUFSIZE];
 
-    ssize_t packet_sz = setup_packet(pic_packet, time_stamp, frame_sz);
+    ssize_t packet_sz = setup_packet(pic_packet, time_stamp, frame_sz, data);
     save_packet_size(packet_sz);
 
     save_packet(pic_packet);
