@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -67,7 +68,7 @@ public class SwingGui extends javax.swing.JFrame {
 	public SwingGui() {
 		initComponents();
 		newInput = false;
-		mode = ClientMonitor.MODE_AUTO;
+		mode = ClientMonitor.MODE_AUTO; 
 	}
 
 	private void initComponents() {
@@ -179,19 +180,16 @@ public class SwingGui extends javax.swing.JFrame {
 		pack();
 	}
 
-	private void updateImage(byte[] image, JLabel label) {
-		label.setIcon(new ImageIcon(image));
-
-		label.repaint();
-
+	private void updateImage(byte[] img, JLabel label) {
+		label.setIcon(new ImageIcon(img));
 	}
 
-	public void updateImage2(byte[] image) {
-		updateImage(image, image2);
+	public void updateImage2(byte[] img) {
+		updateImage(img, image2);
 	}
 
-	public void updateImage1(byte[] image) {
-		updateImage(image, image1);
+	public void updateImage1(byte[] img) {
+		updateImage(img, image1);
 		System.out.println("Image updated in gui");
 	}
 
@@ -232,7 +230,6 @@ public class SwingGui extends javax.swing.JFrame {
 			e.printStackTrace();
 		}
 		image1.setIcon(new ImageIcon(img));
-		notifyAll();
 	}
 
 	private void idleRadioButtonActionPerformed(ActionEvent evt) {
@@ -240,7 +237,6 @@ public class SwingGui extends javax.swing.JFrame {
 		movieRadioButton.setSelected(false);
 		newInput = true;
 		mode = ClientMonitor.MODE_IDLE;
-		notifyAll();
 	}
 
 	private void movieRadioButtonActionPerformed(ActionEvent evt) {
@@ -248,13 +244,31 @@ public class SwingGui extends javax.swing.JFrame {
 		idleRadioButton.setSelected(false);
 		newInput = true;
 		mode = ClientMonitor.MODE_MOVIE;
-		notifyAll();
 	}
 
 	private void syncCheckBoxActionPerformed(ActionEvent evt) {
 		newInput = true;
 		syncMode = syncCheckBox.isSelected() ? MODE_SYNC : MODE_ASYNC;
-		notifyAll();
+	}
+	
+	public static void main (String[] args) {
+		SwingGui gui = new SwingGui();
+		gui.setVisible(true);
+		BufferedImage img = null;
+		try {
+			img = ImageIO.read(new File("./UML Network.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+			ImageIO.write(img, "png", baos);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		byte[] imgarray = baos.toByteArray();
+		
+		gui.updateImage1(imgarray);
 	}
 
 }
