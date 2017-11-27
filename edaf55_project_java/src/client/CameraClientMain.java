@@ -24,6 +24,8 @@ public class CameraClientMain {
 		//PictureNetStarter picCam2 = new PictureNetStarter(cm, ipCam2, 8005, camNbr1);
 		ModeNetStarter modeCam1 = new ModeNetStarter(cm, ipCam1, 9998);
 //		ModeNetStarter modeCam2 = new ModeNetStarter(cm, ipCam2, 8004);
+		MotionNetStarter motion1 = new MotionNetStarter(cm, ipCam1, 9091, camNbr1);
+//		MotionNetStarter motion2 = new MotionNetStarter(cm, ipCam2, 9091, camNbr2);
 		
 		gui.setVisible(true);
 		display1.start();
@@ -32,6 +34,8 @@ public class CameraClientMain {
 //		picCam2.startMe();
 		modeCam1.startMe();
 //		modeCam2.startMe();
+		motion1.startMe();
+//		motion2.startMe();
 	}
 	
 }

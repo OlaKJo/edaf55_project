@@ -313,6 +313,7 @@ void* update_mode_task(void *ctxt)
   while(1)
   {
     int rres = read(cam_mon->connmodefd, buf, 1);
+    printf("received mode update: %d\n", buf[0]);
     if(rres < 0) {
       perror("update_mode_task: read");
       return (void*) (intptr_t) errno;

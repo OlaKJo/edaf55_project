@@ -3,12 +3,14 @@ package client;
 public class ClientMonitor {
 
 	private int mode;
+	private int modeToSend;
 	private boolean forceSync, synced;
 	private byte[] picBuffer1, picBuffer2;
 	private int delayedFrames;
 	private long timeStampPic1, timeStampPic2;
 	private boolean modeChanged;
 	private boolean pic1Available, pic2Available;
+	private boolean motionDetected1, motionDetected2;
 
 	// Number of delayed frames tolerated before mode switch
 	private final int delayedFramesTolerance = 10;
@@ -30,19 +32,19 @@ public class ClientMonitor {
 	}
 
 	public synchronized void setMode(int mode) {
-		if(mode == MODE_AUTO) {
+		if (mode == MODE_AUTO) {
 			modeAuto = true;
-		}
-		else {
+		} else {
 			this.mode = mode;
 			modeChanged = true;
-			notifyAll();	
+			modeToSend = mode - 1;
+			notifyAll();
 		}
 	}
 
 	public synchronized void setSync(boolean sync) {
 
-		if(sync) {
+		if (sync) {
 			this.forceSync = true;
 		}
 
@@ -52,7 +54,7 @@ public class ClientMonitor {
 	}
 
 	public synchronized void putPicture(byte[] pic, long timeStamp, int camNumber) {
-		System.out.println("Image put in clientMonitor");
+//		System.out.println("Image put in clientMonitor");
 		if (camNumber == 1) {
 			picBuffer1 = pic;
 			timeStampPic1 = timeStamp;
@@ -65,8 +67,7 @@ public class ClientMonitor {
 		notifyAll();
 		if (modeAuto && synced) {
 			syncCheck();
-		}
-		else if(modeAuto && !synced){
+		} else if (modeAuto && !synced) {
 			asyncCheck();
 		}
 	}
@@ -97,8 +98,7 @@ public class ClientMonitor {
 	// Check sync to async conditions
 	private void syncCheck() {
 		long currentTimeStamp = System.currentTimeMillis();
-		if ((timeStampPic1 - currentTimeStamp)
-				- (timeStampPic2 -currentTimeStamp) > syncToleranceMillis) {
+		if ((timeStampPic1 - currentTimeStamp) - (timeStampPic2 - currentTimeStamp) > syncToleranceMillis) {
 			delayedFrames++;
 			// Delayed frames, enter asynchronous mode
 			if (delayedFrames > delayedFramesTolerance) {
@@ -129,7 +129,7 @@ public class ClientMonitor {
 		}
 	}
 
-	//TODO
+	// TODO
 	public synchronized boolean getModeUpdate() {
 		try {
 			while (!modeChanged)
@@ -147,6 +147,38 @@ public class ClientMonitor {
 
 	public boolean getSyncMode() {
 		return synced;
+	}
+
+	public synchronized void setMotionDetected(int camNbr, boolean detected) {
+		if (camNbr == 1) {
+			motionDetected1 = detected;
+		} else {
+			motionDetected2 = detected;
+		}
+
+		if (mode == MODE_AUTO) {
+			if (motionDetected1 || motionDetected2) {
+				modeToSend = 1;
+			} else {
+				modeToSend = 0;
+			}
+		}
+
+		notifyAll();
+	}
+
+	public synchronized int getNewMode(int currentMode) {
+		while (currentMode == modeToSend)
+			try {
+//				System.out.println("Checking getNewMode");
+//				System.out.println("currentMode: " + currentMode);
+//				System.out.println("modeToSend: " + modeToSend);
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		return modeToSend;
+				
 	}
 
 }

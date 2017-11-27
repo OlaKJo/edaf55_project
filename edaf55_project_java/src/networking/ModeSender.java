@@ -7,13 +7,14 @@ import java.net.Socket;
 import client.ClientMonitor;
 
 
-public class SendMode extends Thread {
+public class ModeSender extends Thread {
 
 	private NetMonitor monitor;
 	private byte[] buffer;
 	private ClientMonitor cMon;
+	private int mode;
 	
-	public SendMode(NetMonitor mon, ClientMonitor cMon) {
+	public ModeSender(NetMonitor mon, ClientMonitor cMon) {
 		monitor = mon;
 		this.cMon = cMon;
 		buffer = new byte[1];
@@ -31,12 +32,14 @@ public class SendMode extends Thread {
 
 				Socket socket = monitor.getSocket();
 				OutputStream os = socket.getOutputStream();
-				boolean mode = true;
 				
 				// Send data packages of different sizes
+				
 				while (true) {
+					System.out.println("Waiting for mode change in ModeSender");
+					mode = cMon.getNewMode(mode);
+					
 					//boolean mode = cMon.getModeUpdate();
-					mode = !mode;
 					ModePack.pack(buffer, mode);
 					//Utils.printBuffer("ClientWriteThread", size, buffer);
 
@@ -45,8 +48,10 @@ public class SendMode extends Thread {
 					
 					// Flush data
 					os.flush();
-					Thread.sleep(5000);
+					Thread.sleep(500);
+					System.out.println("----------------");
 					System.out.println("wrote mode to stream: " + mode);
+					System.out.println("----------------");
 				}
 			} catch (IOException e) {
 				// Something happened with the connection

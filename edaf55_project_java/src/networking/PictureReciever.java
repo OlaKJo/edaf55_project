@@ -48,14 +48,14 @@ public class PictureReciever extends Thread {
 
 					long ts = PicturePack.getTimeStamp(buffer);
 					int pictureSize = PicturePack.getPictureSize(buffer);
-					System.out.println("pictureSize: " + pictureSize);
-					System.out.print("Timestamp: " + ts);
+//					System.out.println("pictureSize: " + pictureSize);
+//					System.out.print("Timestamp: " + ts);
 					
 					// Read image data
 					size = pictureSize;
 					n = 0;
 					while ((n = is.read(buffer, n + PicturePack.HEAD_SIZE, size)) > 0) {
-						System.out.println(size);
+//						System.out.println(size);
 						size -= n;
 					}
 					if (size != 0)
@@ -64,10 +64,11 @@ public class PictureReciever extends Thread {
 					byte[] imageData = new byte[pictureSize];
 					System.arraycopy(buffer, PicturePack.HEAD_SIZE, imageData, 0, pictureSize);
 					
-					for(int i = 0; i < 500; i++){
-						System.out.print(Byte.toString(buffer[i]) + " ");
-					}
+//					for(int i = 0; i < 500; i++){
+//						System.out.print(Byte.toString(buffer[i]) + " ");
+//					}
 					
+//					System.out.println("Recieved picture!");
 					//put image in monitor
 					clientMonitor.putPicture(imageData, ts ,camNbr);
 
