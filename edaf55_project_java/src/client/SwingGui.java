@@ -72,7 +72,8 @@ public class SwingGui extends javax.swing.JFrame {
 	public SwingGui() {
 		initComponents();
 		newInput = false;
-		mode = ClientMonitor.MODE_AUTO; 
+		mode = ClientMonitor.MODE_MOVIE;
+		movieRadioButton.setSelected(true);
 	}
 
 	private void initComponents() {
@@ -203,12 +204,12 @@ public class SwingGui extends javax.swing.JFrame {
 		label.setIcon(new ImageIcon(img));
 	}
 
-	public void updateImage2(byte[] img) {
-		updateImage(img, image2);
+	public void updateImage2(Picture img) {
+		updateImage(img.byteStream, image2);
 	}
 
-	public void updateImage1(byte[] img) {
-		updateImage(img, image1);
+	public void updateImage1(Picture img) {
+		updateImage(img.byteStream, image1);
 		System.out.println("Image updated in gui");
 	}
 
@@ -224,7 +225,7 @@ public class SwingGui extends javax.swing.JFrame {
 	/*
 	 * @return a vector containing {Mode, Synchronized}
 	 */
-	public int[] getInput() {
+	public synchronized int[] getInput() {
 		try {
 			while (!newInput)
 				wait();
@@ -237,30 +238,37 @@ public class SwingGui extends javax.swing.JFrame {
 		}
 	}
 
-	private void autoRadioButtonActionPerformed(ActionEvent evt) {
+	private synchronized void autoRadioButtonActionPerformed(ActionEvent evt) {
+		autoRadioButton.setSelected(true);
 		idleRadioButton.setSelected(false);
 		movieRadioButton.setSelected(false);
 		newInput = true;
 		mode = ClientMonitor.MODE_AUTO;
+		notifyAll();
 	}
 
-	private void idleRadioButtonActionPerformed(ActionEvent evt) {
+	private synchronized void idleRadioButtonActionPerformed(ActionEvent evt) {
 		autoRadioButton.setSelected(false);
+		idleRadioButton.setSelected(true);
 		movieRadioButton.setSelected(false);
 		newInput = true;
 		mode = ClientMonitor.MODE_IDLE;
+		notifyAll();
 	}
 
-	private void movieRadioButtonActionPerformed(ActionEvent evt) {
+	private synchronized void movieRadioButtonActionPerformed(ActionEvent evt) {
 		autoRadioButton.setSelected(false);
 		idleRadioButton.setSelected(false);
+		movieRadioButton.setSelected(true);
 		newInput = true;
 		mode = ClientMonitor.MODE_MOVIE;
+		notifyAll();
 	}
 
-	private void syncCheckBoxActionPerformed(ActionEvent evt) {
+	private synchronized void syncCheckBoxActionPerformed(ActionEvent evt) {
 		newInput = true;
 		syncMode = syncCheckBox.isSelected() ? MODE_SYNC : MODE_ASYNC;
+		notifyAll();
 	}
 	
 //	public static void main (String[] args) {

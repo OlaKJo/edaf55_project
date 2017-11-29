@@ -1,11 +1,15 @@
 package client;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class ClientMonitor {
 
 	private int mode;
 	private int modeToSend;
 	private boolean forceSync, synced;
-	private byte[] picBuffer1, picBuffer2;
+	private LinkedList<Picture> picBuffer1, picBuffer2;
 	private int delayedFrames;
 	private long timeStampPic1, timeStampPic2;
 	private boolean modeChanged;
@@ -16,24 +20,31 @@ public class ClientMonitor {
 	private final int delayedFramesTolerance = 10;
 	private final long syncToleranceMillis = 200;
 	public static final int MODE_AUTO = 0, MODE_IDLE = 1, MODE_MOVIE = 2;
-	private boolean modeAuto;
+	private boolean modeIsSetToAuto;
+	private Picture lastPic1 = new Picture(null, 0);
+	private Picture lastPic2 = new Picture(null, 0);
+	private LinkedList<Long> syncStamps1, syncStamps2;
 
 	public ClientMonitor() {
 
 		delayedFrames = 0;
 		this.forceSync = false;
-		synced = true;
+		setSynced(false);
 		mode = MODE_AUTO;
-		modeAuto = true;
+		modeIsSetToAuto = true;
 		modeChanged = false;
 		pic1Available = false;
 		pic2Available = false;
+		picBuffer1 = new LinkedList<Picture>();
+		picBuffer2 = new LinkedList<Picture>();
+		syncStamps1 = new LinkedList<Long>();
+		syncStamps2 = new LinkedList<Long>();
 
 	}
 
 	public synchronized void setMode(int mode) {
 		if (mode == MODE_AUTO) {
-			modeAuto = true;
+			modeIsSetToAuto = true;
 		} else {
 			this.mode = mode;
 			modeChanged = true;
@@ -42,37 +53,81 @@ public class ClientMonitor {
 		}
 	}
 
-	public synchronized void setSync(boolean sync) {
+	public synchronized void setForcedSync(boolean sync) {
 
 		if (sync) {
 			this.forceSync = true;
+			System.out.println("Sync set to forced");
 		}
-
-		modeChanged = true;
-		notifyAll();
-
+	}
+	
+	private void setSynced(boolean sync) {
+		synced = sync;
+		System.out.println("synced set");
 	}
 
-	public synchronized void putPicture(byte[] pic, long timeStamp, int camNumber) {
-//		System.out.println("Image put in clientMonitor");
+	public synchronized void putPicture(Picture pic, int camNumber) {
+		System.out.println("Image put in clientMonitor");
+
 		if (camNumber == 1) {
-			picBuffer1 = pic;
-			timeStampPic1 = timeStamp;
+			picBuffer1.add(pic);
+			lastPic1 = pic;
 			pic1Available = true;
+			if (lastPic2.timeStamp != 0)
+				syncReqCheckCam1Add(pic);
 		} else {
-			picBuffer2 = pic;
-			timeStampPic2 = timeStamp;
+			picBuffer2.add(pic);
+			lastPic2 = pic;
 			pic2Available = true;
+			if (lastPic1.timeStamp != 0)
+				syncReqCheckCam2Add(pic);
 		}
 		notifyAll();
-		if (modeAuto && synced) {
-			syncCheck();
-		} else if (modeAuto && !synced) {
-			asyncCheck();
+	}
+
+	private void syncReqCheckCam1Add(Picture pic) {
+		syncReqCheck(pic, lastPic2, syncStamps1, syncStamps2);
+	}
+
+	private void syncReqCheckCam2Add(Picture pic) {
+		syncReqCheck(pic, lastPic1, syncStamps2, syncStamps1);
+	}
+
+	private void syncReqCheck(Picture pic, Picture otherLastPic, LinkedList<Long> syncStamps,
+			LinkedList<Long> OtherSyncStamps) {
+
+		long diff = 0;
+		diff = pic.timeStamp - otherLastPic.timeStamp;
+		boolean syncReq = (Math.abs(diff) <= syncToleranceMillis);
+
+		if (synced)
+			asyncCheck(syncReq, diff, syncStamps, OtherSyncStamps, pic, otherLastPic);
+		else if (syncCheck(syncReq, syncStamps)) {
+			syncStamps.add(pic.timeStamp);
 		}
 	}
 
-	public synchronized byte[] getPicture(int camNumber) {
+	private void asyncCheck(boolean syncReq, long diff, LinkedList<Long> syncStamps, LinkedList<Long> OtherSyncStamps,
+			Picture pic, Picture otherLastPic) {
+		if (syncReq || diff < 0 || forceSync) {
+			syncStamps1.clear();
+			syncStamps2.clear();
+			return;
+		} else {
+			syncStamps.add(pic.timeStamp);
+			while ((syncStamps.peekFirst() - otherLastPic.timeStamp) <= syncToleranceMillis) {
+				syncStamps.removeFirst();
+			}
+		}
+
+		if (syncStamps1.size() >= delayedFramesTolerance || syncStamps2.size() >= delayedFramesTolerance) {
+			syncStamps1.clear();
+			syncStamps2.clear();
+			setSynced(false);
+		}
+	}
+
+	public synchronized Picture getPicture(int camNumber) {
 		if (camNumber == 1) {
 			try {
 				while (!pic1Available)
@@ -82,7 +137,7 @@ public class ClientMonitor {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			return picBuffer1;
+			return picBuffer1.remove();
 		} else {
 			try {
 				while (!pic2Available)
@@ -91,42 +146,18 @@ public class ClientMonitor {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			return picBuffer2;
+			return picBuffer2.remove();
 		}
 	}
 
-	// Check sync to async conditions
-	private void syncCheck() {
-		long currentTimeStamp = System.currentTimeMillis();
-		if ((timeStampPic1 - currentTimeStamp) - (timeStampPic2 - currentTimeStamp) > syncToleranceMillis) {
-			delayedFrames++;
-			// Delayed frames, enter asynchronous mode
-			if (delayedFrames > delayedFramesTolerance) {
-				mode = MODE_IDLE;
-				modeChanged = true;
-				notifyAll();
-				delayedFrames = 10;
-			}
-		} else {
-			delayedFrames = 0;
+	private boolean syncCheck(boolean syncReq, LinkedList<Long> syncStamps) {
+		if (forceSync || syncReq) {
+			syncStamps1.clear();
+			syncStamps2.clear();
+			setSynced(true);
+			return true;
 		}
-	}
-
-	// Check async to sync conditions
-	private void asyncCheck() {
-		if ((timeStampPic1 - System.currentTimeMillis())
-				- (timeStampPic2 - System.currentTimeMillis()) < syncToleranceMillis) {
-			delayedFrames--;
-			// Delay stabilized, resume synchrous operation
-			if (delayedFrames < delayedFramesTolerance) {
-				mode = MODE_MOVIE;
-				modeChanged = true;
-				notifyAll();
-				delayedFrames = 10;
-			}
-		} else {
-			delayedFrames = 10;
-		}
+		return false;
 	}
 
 	// TODO
@@ -170,15 +201,15 @@ public class ClientMonitor {
 	public synchronized int getNewMode(int currentMode) {
 		while (currentMode == modeToSend)
 			try {
-//				System.out.println("Checking getNewMode");
-//				System.out.println("currentMode: " + currentMode);
-//				System.out.println("modeToSend: " + modeToSend);
+				// System.out.println("Checking getNewMode");
+				// System.out.println("currentMode: " + currentMode);
+				// System.out.println("modeToSend: " + modeToSend);
 				wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		return modeToSend;
-				
+
 	}
 
 }

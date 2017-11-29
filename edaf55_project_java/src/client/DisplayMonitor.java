@@ -2,33 +2,51 @@ package client;
 
 public class DisplayMonitor {
 
-	private byte[] pic_1, pic_2;
+	private Picture pic_1, pic_2;
 	private SwingGui gui;
-	private long timeStampPic1, timeStampPic2;
+	private long showedTime = 0;
+	private long lastTimeStamp;
+	private long timeDiff;
+	private boolean isSynced = false;
 
 	public DisplayMonitor(SwingGui gui) {
 		this.gui = gui;
-		timeStampPic1 = System.currentTimeMillis();
-		timeStampPic2 = System.currentTimeMillis();
 	}
 
-	public synchronized void updatePicture1(byte[] pic) {
+	public synchronized void updatePicture1(Picture pic) {
 		System.out.println("Image updated in displaymonitor");
-		long arrivalTime = System.currentTimeMillis();
 		this.pic_1 = pic;
+		syncDelayThread(pic);
 		gui.updateImage1(pic_1);
-		timeStampPic1 = arrivalTime;
+		showedTime = System.currentTimeMillis();
+		lastTimeStamp = pic.timeStamp;
 	}
 
-	public synchronized void updatePicture2(byte[] pic) {
-		long arrivalTime = System.currentTimeMillis();
+	public synchronized void updatePicture2(Picture pic) {
 		this.pic_2 = pic;
+		syncDelayThread(pic);
 		gui.updateImage1(pic_2);
-		timeStampPic2 = arrivalTime;
+		showedTime = System.currentTimeMillis();
+		lastTimeStamp = pic.timeStamp;
 	}
 	
 	public synchronized void setSyncLabel(boolean synced) {
 		gui.setSyncLabel(synced);
+	}
+	
+	private void syncDelayThread(Picture pic) {
+		if (isSynced && !(showedTime == 0)) {
+			timeDiff = pic.timeStamp - lastTimeStamp;
+			try {
+				wait(System.currentTimeMillis() - (showedTime + timeDiff));
+			} catch (Exception e) { // DANGER DANGER
+				//e.printStackTrace();
+			} //MEGA DANGER
+		}
+	}
+
+	public void setSynced(boolean syncMode) {
+		isSynced = syncMode;
 	}
 
 }

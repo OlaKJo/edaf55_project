@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import client.ClientMonitor;
+import client.Picture;
 
 public class PictureReciever extends Thread {
 
@@ -70,7 +71,7 @@ public class PictureReciever extends Thread {
 					
 //					System.out.println("Recieved picture!");
 					//put image in monitor
-					clientMonitor.putPicture(imageData, ts ,camNbr);
+					clientMonitor.putPicture(new Picture(imageData, ts) ,camNbr);
 
 					// ImageIcon a = new ImageIcon(imageData);
 				}
