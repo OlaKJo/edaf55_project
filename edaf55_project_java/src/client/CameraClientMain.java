@@ -10,15 +10,10 @@ public class CameraClientMain {
 	public static void main(String[] args) {
 		
 		int camNbr1 = 1, camNbr2 = 2;
-<<<<<<< HEAD
+
 		//Subject to change
 		String ipCam1 = "127.0.0.1";
 //		String ipCam1 = "130.235.34.185";
-=======
-
-//		String ipCam1 = "127.0.0.1";
-		String ipCam1 = "130.235.34.187";
->>>>>>> bd697ba9e26b450912add3807b570d8ed230d500
 		String ipCam2 = "130.235.34.185";
 		
 		SwingGui gui = new SwingGui();
