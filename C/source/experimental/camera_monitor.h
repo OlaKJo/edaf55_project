@@ -9,6 +9,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <inttypes.h>
 
 #define USE_CAMERA
 

@@ -163,8 +163,9 @@ int client_save_frame(struct client* client, frame* fr)
   #endif
 
   size_t frame_sz = get_frame_size(fr);
-  size_t time_stamp = get_frame_timestamp(fr);
-  printf("timestamp is: %zu\n",time_stamp);
+  capture_time time_stamp = get_frame_timestamp(fr);
+  printf("timestamp is: %llu\n",time_stamp);
+  //printf("%" PRIu64 "\n", time_stamp);
   byte * data = get_frame_bytes(fr);
 
   byte pic_packet[BUFSIZE];

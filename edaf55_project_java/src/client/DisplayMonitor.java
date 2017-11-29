@@ -73,7 +73,7 @@ public class DisplayMonitor {
 		showedTime = System.currentTimeMillis();
 		lastTimeStamp = pic.timeStamp;
 
-		rollingTimestampAverage1.add(System.currentTimeMillis() - pic.timeStamp);
+		rollingTimestampAverage2.add(System.currentTimeMillis() - pic.timeStamp);
 		gui.setDelayLabel2(checkDelay(rollingTimestampAverage2));
 	}
 
