@@ -12,7 +12,7 @@ public class MotionNetStarter {
 		threads = new Thread[] {
 			new MotionRequestSender(netMon, cMon),
 			new MotionDataReceiver(netMon, cMon, camNum),
-			new ClientConnectionThread(netMon, ip, port),
+			new ClientConnectionThread(netMon, ip, port, "MotionSender " + camNum),
 			new ClientShutdownThread(netMon)
 		};
 	}

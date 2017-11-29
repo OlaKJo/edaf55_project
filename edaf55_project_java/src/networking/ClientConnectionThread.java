@@ -14,12 +14,15 @@ public class ClientConnectionThread extends Thread {
 	private String host;
 	private int port;
 	private boolean reconnect;
+	private String id;
 	
-	public ClientConnectionThread(NetMonitor mon, String host, int port) {
+	
+	public ClientConnectionThread(NetMonitor mon, String host, int port, String id) {
 		monitor = mon;
 		this.host = host;
 		this.port = port;
 		reconnect = false;
+		this.id = id;
 	}
 	
 	// Connect and reconnect if connection is dropped.
@@ -51,7 +54,7 @@ public class ClientConnectionThread extends Thread {
 				// Example: the connection is closed on the server side, but
 				// the client is still trying to write data.
 				monitor.setActive(false);
-				System.out.println("No connection on client side");
+				System.out.println("No connection on client side: " + id);
 			} catch (InterruptedException e) {
 				// Occurs when interrupted
 				monitor.shutdown();

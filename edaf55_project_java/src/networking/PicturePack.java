@@ -16,6 +16,7 @@ public class PicturePack {
 	}
 
 	public static long getTimeStamp(byte[] buffer) {
+<<<<<<< HEAD
 //		byte[] tsData = new byte[8];
 //		System.arraycopy(buffer, 0, tsData, 0, 8);
 //		ByteBuffer tsBuffer = ByteBuffer.allocate(Long.BYTES);
@@ -42,6 +43,17 @@ public class PicturePack {
 	    int returnInt = sizeBuffer.getInt();
 	    System.out.println("The time_stamp is now: " + returnInt);
 	    return returnInt;
+=======
+		byte[] tsData = new byte[8];
+		System.arraycopy(buffer, 0, tsData, 0, 8);
+//		ByteBuffer tsBuffer = ByteBuffer.allocate(Long.BYTES);
+//		tsBuffer.put(tsData);
+//		tsBuffer.flip();
+//		tsBuffer.order(ByteOrder.LITTLE_ENDIAN);
+		BigInteger bigTime = new BigInteger(1, tsData);
+		
+		return 1l;
+>>>>>>> bd697ba9e26b450912add3807b570d8ed230d500
 	}
 
 	public static int getPictureSize(byte[] buffer) {

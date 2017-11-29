@@ -172,14 +172,14 @@ int client_save_frame(struct client* client, frame* fr)
   ssize_t packet_sz = setup_packet(pic_packet, time_stamp, frame_sz, data);
 
 
-  // FILE *fp;
-  // fp = fopen("./test.txt", "w");
+  //FILE *fp;
+  //fp = fopen("./test.txt", "w");
   //int i;
-  // for(i = 0; i < frame_sz; i++) {
-  //    fprintf(fp, "%c", data[i]);
-  //    fprintf(stdout, "%c", data[i]);
-  // }
-  // fclose(fp);
+  //for(i = 0; i < frame_sz; i++) {
+  //   fprintf(fp, "%c", data[i]);
+  //   fprintf(stdout, "%c", data[i]);
+  //}
+  //fclose(fp);
 
   save_packet_size(packet_sz);
 
