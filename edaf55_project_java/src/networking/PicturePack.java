@@ -1,6 +1,7 @@
 
 package networking;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -15,13 +16,32 @@ public class PicturePack {
 	}
 
 	public static long getTimeStamp(byte[] buffer) {
-		byte[] tsData = new byte[8];
-		System.arraycopy(buffer, 0, tsData, 0, 8);
-		ByteBuffer tsBuffer = ByteBuffer.allocate(Long.BYTES);
-		tsBuffer.put(tsData);
-		tsBuffer.flip();
-		tsBuffer.order(ByteOrder.LITTLE_ENDIAN);
-		return tsBuffer.getLong();
+//		byte[] tsData = new byte[8];
+//		System.arraycopy(buffer, 0, tsData, 0, 8);
+//		ByteBuffer tsBuffer = ByteBuffer.allocate(Long.BYTES);
+//		tsBuffer.put(tsData);
+//		tsBuffer.flip();
+//		tsBuffer.order(ByteOrder.BIG_ENDIAN);
+//		byte[] rearranged = tsBuffer.array();
+//		//long temp = tsBuffer.getLong();
+//		
+//		BigInteger bigInt = new BigInteger(1,rearranged);
+//		long print = Long.parseUnsignedLong(bigInt.toString());
+//		System.out.println("timestamp is now: " + print);
+//		for(int i = 0; i < tsData.length; i++) {
+//			System.out.println(tsData[i] + " ");
+//		}
+//		return print;
+		
+		byte[] tsData = new byte[4];
+		System.arraycopy(buffer, 0, tsData, 0, 4);
+		ByteBuffer sizeBuffer = ByteBuffer.allocate(Integer.BYTES);
+		sizeBuffer.put(tsData);
+		sizeBuffer.flip();
+		sizeBuffer.order(ByteOrder.LITTLE_ENDIAN);
+	    int returnInt = sizeBuffer.getInt();
+	    System.out.println("The time_stamp is now: " + returnInt);
+	    return returnInt;
 	}
 
 	public static int getPictureSize(byte[] buffer) {

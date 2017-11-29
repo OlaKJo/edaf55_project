@@ -112,6 +112,7 @@ void close_camera(struct global_state* state)
 ssize_t setup_packet(byte * pic_packet, uint64_t time_stamp, uint32_t frame_sz, byte * data)
 {
   size_t header_size = 10;
+  time_stamp = time_stamp / 1000000;
   memcpy(pic_packet, &time_stamp, 8);
   memcpy(pic_packet+8, &frame_sz, 2);
   memcpy(pic_packet+header_size, data, frame_sz);
@@ -163,7 +164,7 @@ int client_save_frame(struct client* client, frame* fr)
 
   size_t frame_sz = get_frame_size(fr);
   size_t time_stamp = get_frame_timestamp(fr);
-  //printf("Size of image captured: %zu\n",frame_sz);
+  printf("timestamp is: %zu\n",time_stamp);
   byte * data = get_frame_bytes(fr);
 
   byte pic_packet[BUFSIZE];
@@ -171,14 +172,14 @@ int client_save_frame(struct client* client, frame* fr)
   ssize_t packet_sz = setup_packet(pic_packet, time_stamp, frame_sz, data);
 
 
-  FILE *fp;
-  fp = fopen("./test.txt", "w");
-  int i;
-  for(i = 0; i < frame_sz; i++) {
-     fprintf(fp, "%c", data[i]);
-     fprintf(stdout, "%c", data[i]);
-  }
-  fclose(fp);
+  // FILE *fp;
+  // fp = fopen("./test.txt", "w");
+  //int i;
+  // for(i = 0; i < frame_sz; i++) {
+  //    fprintf(fp, "%c", data[i]);
+  //    fprintf(stdout, "%c", data[i]);
+  // }
+  // fclose(fp);
 
   save_packet_size(packet_sz);
 
