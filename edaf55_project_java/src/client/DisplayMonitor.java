@@ -32,9 +32,10 @@ public class DisplayMonitor {
 
 		rollingTimestampAverage1.add(System.currentTimeMillis() - pic.timeStamp);
 		gui.setDelayLabel1(checkDelay(rollingTimestampAverage1));
+		System.out.println("Current Time=" + (System.currentTimeMillis()) + "\nTime Stamp: " + pic.timeStamp);
 	}
 
-	private int checkDelay(LinkedList<Long> rollingTimestampAverage) {
+	private long checkDelay(LinkedList<Long> rollingTimestampAverage) {
 
 		long delay;
 
@@ -62,7 +63,7 @@ public class DisplayMonitor {
 			rollingTimestampAverage.removeFirst();
 		}
 
-		return (int) delay;
+		return delay;
 	}
 
 	public synchronized void updatePicture2(Picture pic) {

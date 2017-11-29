@@ -261,11 +261,11 @@ public class SwingGui extends javax.swing.JFrame {
 		return mode;
 	}
 
-	public void setDelayLabel1(int delay) {
-		delayLabel1.setText(delay + " ms");
+	public void setDelayLabel1(long l) {
+		delayLabel1.setText(l + " ms");
 	}
 	
-	public void setDelayLabel2(int delay) {
-		delayLabel2.setText(delay + " ms");
+	public void setDelayLabel2(long l) {
+		delayLabel2.setText(l + " ms");
 	}
 }
