@@ -9,10 +9,12 @@ public class DisplayMonitor {
 	private long showedTime = 0;
 	private long lastTimeStamp;
 	private long timeDiff;
+	private long currentAverageDelay = 0;
 	private boolean isSynced = false;
 	private LinkedList<Long> rollingTimestampAverage1;
 	private LinkedList<Long> rollingTimestampAverage2;
 	private int mode;
+	private long timeOfStart = -1;
 
 	public DisplayMonitor(SwingGui gui) {
 		this.gui = gui;
@@ -27,33 +29,41 @@ public class DisplayMonitor {
 		gui.updateImage1(pic_1);
 		showedTime = System.currentTimeMillis();
 		lastTimeStamp = pic.timeStamp;
-		
+
 		rollingTimestampAverage1.add(System.currentTimeMillis() - pic.timeStamp);
 		gui.setDelayLabel1(checkDelay(rollingTimestampAverage1));
+		System.out.println("Current Time=" + (System.currentTimeMillis()) + "\nTime Stamp: " + pic.timeStamp);
 	}
 
-	private int checkDelay(LinkedList<Long> rollingTimestampAverage) {
-		
+	private long checkDelay(LinkedList<Long> rollingTimestampAverage) {
+
 		long delay;
-		
-		if(mode == ClientMonitor.MODE_IDLE){
+
+		if (timeOfStart == -1) {
+			timeOfStart = System.currentTimeMillis();
+		}
+
+		if (mode == ClientMonitor.MODE_IDLE) {
 			delay = rollingTimestampAverage.getLast();
 			rollingTimestampAverage.clear();
-		}
-		else{
-			delay = 0;
-			if(rollingTimestampAverage.size() >= 60){
-				for(long l : rollingTimestampAverage){
-					delay += l / rollingTimestampAverage.size();
+		} else {
+			
+			if (System.currentTimeMillis() - timeOfStart >= 2000) {
+				currentAverageDelay = 0;
+				timeOfStart = -1;
+				for (long l : rollingTimestampAverage) {
+					currentAverageDelay += l / rollingTimestampAverage.size();
 				}
-				rollingTimestampAverage.removeLast();
 			}
-			else{
-				delay = rollingTimestampAverage.peek();
-			}
+
+			delay = currentAverageDelay;
 		}
 		
-		return (int) delay;
+		if (rollingTimestampAverage.size() >= 180) {
+			rollingTimestampAverage.removeFirst();
+		}
+
+		return delay;
 	}
 
 	public synchronized void updatePicture2(Picture pic) {
@@ -62,23 +72,23 @@ public class DisplayMonitor {
 		gui.updateImage2(pic_2);
 		showedTime = System.currentTimeMillis();
 		lastTimeStamp = pic.timeStamp;
-		
+
 		rollingTimestampAverage1.add(System.currentTimeMillis() - pic.timeStamp);
 		gui.setDelayLabel2(checkDelay(rollingTimestampAverage2));
 	}
-	
+
 	public synchronized void setSyncLabel(boolean synced) {
 		gui.setSyncLabel(synced);
 	}
-	
+
 	private void syncDelayThread(Picture pic) {
 		if (isSynced && !(showedTime == 0)) {
 			timeDiff = pic.timeStamp - lastTimeStamp;
 			try {
 				wait(System.currentTimeMillis() - (showedTime + timeDiff));
 			} catch (Exception e) { // DANGER DANGER
-				//e.printStackTrace();
-			} //MEGA DANGER
+				// e.printStackTrace();
+			} // MEGA DANGER
 		}
 	}
 
