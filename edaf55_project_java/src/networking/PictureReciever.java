@@ -14,7 +14,7 @@ public class PictureReciever extends Thread {
 	private NetMonitor netMonitor;
 	private ClientMonitor clientMonitor;
 	private byte[] buffer;
-	private final int MAXIMUM_PICTURE_SIZE = 50000;
+	private final int MAXIMUM_PICTURE_SIZE = 500000;
 	private int camNbr;
 
 	public PictureReciever(NetMonitor mon, ClientMonitor clientMonitor, int camNbr) {

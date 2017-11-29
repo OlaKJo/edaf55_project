@@ -22,8 +22,7 @@
 #define SEND_PIC_STATE 1
 #define TAKE_PIC_STATE 0
 
-#define BUFSIZE 50000
-typedef char byte;
+#define BUFSIZE 500000
 
 struct camera_monitor {
   byte pic_packet[BUFSIZE];

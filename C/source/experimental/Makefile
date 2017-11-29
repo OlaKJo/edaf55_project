@@ -27,21 +27,21 @@ LDFLAGS+=${AXIS_LIBCAP} ${AXIS_LIBCAP_DEP} ${AXIS_LIBCAP} -L${AXIS_PATH}/lib -L$
 CFLAGS+=-O3 -g -Wall
 LDLIBS+=-lpthread
 
-all: http_server motion_server
+all: server motion_server
 
-http_server: http_server.o  camera.o server_common.o
-http_server.o: http_server.c camera.h 
+server: server.o  camera.o server_common.o camera_monitor.o
+server.o: server.c camera.h
 motion_server: motion_server.o  server_common.o
 motion_server.o: motion_server.c
 server_common.o: server_common.c server_common.h
 camera.o: camera.c camera.h fakecapture.h
+camera_monitor.o: camera_monitor.c camera_monitor.h
 
 clean:
-	-rm http_server.o motion_server.o server_common.o camera.o
+	-rm server.o motion_server.o server_common.o camera.o camera_monitor.o
 
 distclean: clean
-	-rm http_server motion_server
+	-rm server motion_server
 
 
 .PHONY: all clean
-
