@@ -29,16 +29,6 @@ public class Display extends Thread {
 			} else {
 				displayMonitor.updatePicture2(pic);
 			}
-			
-
-			//TODO
-			// Only display for Cam1 updates the GUI, move to displayMonitor
-//			if (camNbr == 1) {
-//				if (synced != oldSyncMode) {
-//					displayMonitor.setSyncLabel(synced);
-//					oldSyncMode = synced;
-//				}
-//			}
 		}
 	}
 
