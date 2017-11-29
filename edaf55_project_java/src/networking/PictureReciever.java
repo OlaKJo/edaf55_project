@@ -1,9 +1,15 @@
 package networking;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+import javax.imageio.ImageIO;
 
 import client.ClientMonitor;
 
@@ -14,7 +20,7 @@ public class PictureReciever extends Thread {
 	private NetMonitor netMonitor;
 	private ClientMonitor clientMonitor;
 	private byte[] buffer;
-	private final int MAXIMUM_PICTURE_SIZE = 500000;
+	private final int MAXIMUM_PICTURE_SIZE = 50000;
 	private int camNbr;
 
 	public PictureReciever(NetMonitor mon, ClientMonitor clientMonitor, int camNbr) {
@@ -48,7 +54,7 @@ public class PictureReciever extends Thread {
 
 					long ts = PicturePack.getTimeStamp(buffer);
 					int pictureSize = PicturePack.getPictureSize(buffer);
-//					System.out.println("pictureSize: " + pictureSize);
+					System.out.println("pictureSize: " + pictureSize);
 //					System.out.print("Timestamp: " + ts);
 					
 					// Read image data
@@ -61,9 +67,18 @@ public class PictureReciever extends Thread {
 					if (size != 0)
 						break;
 
+					
 					byte[] imageData = new byte[pictureSize];
 					System.arraycopy(buffer, PicturePack.HEAD_SIZE, imageData, 0, pictureSize);
 					
+					BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageData));
+					File outputfile = new File("./testimage.jpg");
+				    ImageIO.write(img, "jpg", outputfile);
+				    
+				    try (FileOutputStream fos = new FileOutputStream("./imagebytes")) {
+				    	   fos.write(imageData);
+				    	   fos.close();
+				    	}
 //					for(int i = 0; i < 500; i++){
 //						System.out.print(Byte.toString(buffer[i]) + " ");
 //					}
@@ -81,12 +96,17 @@ public class PictureReciever extends Thread {
 				// Example: the connection is closed on the server side, but
 				// the client is still trying to write data.
 				netMonitor.setActive(false);
-				System.out.println("Failed to read data from server");
+				System.out.println("IOException! Failed to read data from server");
 			} catch (InterruptedException e) {
-				// Occurs when interrupted
+				System.out.println("InterruptedException! Failed to read data from server");
+				netMonitor.shutdown();
+				break;
+			} catch (Exception e) {
+				System.out.println("Exception! Failed to read data from server");
 				netMonitor.shutdown();
 				break;
 			}
+			
 		}
 
 		// No resources to dispose since this is the responsibility

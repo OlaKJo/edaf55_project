@@ -31,6 +31,7 @@
 #endif
 
 struct client{
+  bool isConnected;
   byte sendBuff[BUFSIZE];
   #ifdef USE_CAMERA
   byte* frame_data;
@@ -135,6 +136,8 @@ int client_send_frame(struct client* client)
   get_packet(pic_packet);
 
   ssize_t packet_sz = get_packet_size();
+  //printf("Size of packet sent: %zd\n", packet_sz);
+
 
   int written=client_write_n(pic_packet, packet_sz);
 
@@ -160,11 +163,22 @@ int client_save_frame(struct client* client, frame* fr)
 
   size_t frame_sz = get_frame_size(fr);
   size_t time_stamp = get_frame_timestamp(fr);
+  //printf("Size of image captured: %zu\n",frame_sz);
   byte * data = get_frame_bytes(fr);
 
   byte pic_packet[BUFSIZE];
 
   ssize_t packet_sz = setup_packet(pic_packet, time_stamp, frame_sz, data);
+
+
+  FILE *fp;
+  fp = fopen("./test.txt", "w");
+  // for(int i = 0; i < frame_sz; i++) {
+  //   fprintf(fp, "%c", data[i]);
+  //   //fprintf(stdout, "%c", data[i]);
+  // }
+  fclose(fp);
+
   save_packet_size(packet_sz);
 
   save_packet(pic_packet);
@@ -205,6 +219,7 @@ int try_get_frame(struct client* client)
   int result=-1;
   frame *fr = fr = camera_get_frame(cam_mon->cam);
 
+
   if(fr) {
     if((result = client_save_frame(client, fr))) {
       printf("Warning: client_save_frame returned %d\n", result);
@@ -241,7 +256,7 @@ void* take_picture_task(void *ctxt)
 {
 
   struct client* client = ctxt;
-  while(1)
+  while(client->isConnected)
   {
     //mutex logic
     pthread_mutex_lock(&global_mutex);
@@ -278,7 +293,7 @@ void* take_picture_task(void *ctxt)
 void* send_picture_task(void *ctxt)
 {
   struct client* client = ctxt;
-  while(1)
+  while(client->isConnected)
   {
     //mutex logic
     pthread_mutex_lock(&global_mutex);
@@ -309,11 +324,17 @@ void* send_picture_task(void *ctxt)
 */
 void* update_mode_task(void *ctxt)
 {
+  struct client* client = ctxt;
   char buf[1] = {};
-  while(1)
+  while(client->isConnected)
   {
     int rres = read(cam_mon->connmodefd, buf, 1);
-    printf("received mode update: %d\n", buf[0]);
+    //printf("received mode update: %d\n", buf[0]);
+    printf("rres is: %d\nbuf is: %d\n", rres, buf[0]);
+    if(rres == 0) {
+      printf("client disconnected!");
+      client->isConnected = false;
+    }
     if(rres < 0) {
       perror("update_mode_task: read");
       return (void*) (intptr_t) errno;
@@ -382,6 +403,8 @@ int try_accept(struct global_state* state, struct client* client)
   cam_mon->cam = state->cam;
   cam_mon->connfd = accept(state->listenfd, (struct sockaddr*)NULL, NULL);
   cam_mon->connmodefd = accept(state->modefd, (struct sockaddr*)NULL, NULL);
+
+  client->isConnected = true;
 
   if(cam_mon->connfd < 0) {
     result = errno;
@@ -466,7 +489,8 @@ int serve_clients(struct global_state* state)
   int result=0;
   state->pfd.fd = state->listenfd;
   state->pfd.events=POLLIN;
-  while(is_running(state)) {
+while(1) {
+  //while(is_running(state)) {
     int ret; // result of poll
 
     struct client* client = malloc(sizeof(*client));
@@ -498,6 +522,7 @@ int serve_clients(struct global_state* state)
         server_quit(state);
       };
     }
+    client->isConnected = false;
     free(client);
   }
   failed_to_alloc_client:
@@ -569,18 +594,25 @@ int bind_and_listen(int * member, int port)
 
 int main(int argc, char *argv[])
 {
-  int port1 = 9999;
-  int port2 = 9998;
+  int port1;
+  int port2;
   struct global_state state;
   int result=0;
 
   if(argc==2) {
-    printf("interpreting %s as port number\n", argv[1]);
+    printf("interpreting %s as port number for image\n", argv[1]);
     port1 = atoi(argv[1]);
+    port2 = 9998;
+  } else if(argc==3) {
+    printf("interpreting %s as port number for image\n", argv[1]);
+    printf("interpreting %s as port number for motion\n", argv[2]);
+    port1 = atoi(argv[1]);
+    port2 = atoi(argv[2]);
   } else {
     port1 = 9999;
+    port2 = 9998;
   }
-  printf("starting on port %d\n", port1);
+  printf("starting on port %d and port %d\n", port1, port2);
 
   init_global_state(&state);
 
