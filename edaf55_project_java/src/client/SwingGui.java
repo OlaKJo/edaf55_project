@@ -187,21 +187,6 @@ public class SwingGui extends javax.swing.JFrame {
 	}
 
 	private void updateImage(byte[] img, JLabel label) {
-//		if(onlyOnce == 0) {
-//			InputStream bas = new ByteArrayInputStream(img);
-//			
-//			System.out.println("" + img.length);
-//			
-//			try {
-//				File f = new File("firstImage.jpg");
-//				BufferedImage bf = ImageIO.read(bas);
-//				//if (bf != null) 
-//				ImageIO.write(bf, "jpg", f);
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		onlyOnce = 1;
 		label.setIcon(new ImageIcon(img));
 	}
 
@@ -277,31 +262,10 @@ public class SwingGui extends javax.swing.JFrame {
 	}
 
 	public void setDelayLabel1(int delay) {
-		delayLabel1.setText(delay + "");
+		delayLabel1.setText(delay + " ms");
 	}
 	
 	public void setDelayLabel2(int delay) {
-		delayLabel2.setText(delay + "");
+		delayLabel2.setText(delay + " ms");
 	}
-	
-//	public static void main (String[] args) {
-//		SwingGui gui = new SwingGui();
-//		gui.setVisible(true);
-//		BufferedImage img = null;
-//		try {
-//			img = ImageIO.read(new File("./UML Network.png"));
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//		try {
-//			ImageIO.write(img, "png", baos);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		byte[] imgarray = baos.toByteArray();
-//		
-//		gui.updateImage1(imgarray);
-//	}
-
 }
