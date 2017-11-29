@@ -22,7 +22,7 @@ public class Input extends Thread {
 				oldMode = inputs[0];
 			}
 			if (oldSyncMode != inputs[1]) {
-				monitor.setSync((inputs[1] == SwingGui.MODE_SYNC) ? true : false);
+				monitor.setForcedSync((inputs[1] == SwingGui.MODE_SYNC) ? true : false);
 				oldSyncMode = inputs[1];
 			}
 		}

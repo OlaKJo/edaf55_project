@@ -14,6 +14,7 @@ import java.nio.ByteOrder;
 import javax.imageio.ImageIO;
 
 import client.ClientMonitor;
+import client.Picture;
 
 public class PictureReciever extends Thread {
 
@@ -81,31 +82,9 @@ public class PictureReciever extends Thread {
 					byte[] imageData = new byte[pictureSize];
 					System.arraycopy(buffer, PicturePack.HEAD_SIZE, imageData, 0, pictureSize);
 
-					BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageData));
-					File outputfile = new File("./testimage.jpg");
-					ImageIO.write(img, "jpg", outputfile);
-
-					FileWriter fw = new FileWriter("./imagebytes2");
-					BufferedWriter bw = new BufferedWriter(fw);
-					
-					for (int i = 0; i < buffer.length; i++) {
-						bw.write(buffer[i] + "\n");
-					}
-					bw.close();
-//					
-//					try (FileOutputStream fos = new FileOutputStream("./imagebytes2")) {
-//						for (int i = 0; i < buffer.length; i++) {
-//							fos.write(buffer[i]);
-//						}
-//						fos.close();
-//					}
-					// for(int i = 0; i < 500; i++){
-					// System.out.print(Byte.toString(buffer[i]) + " ");
-					// }
-
-					// System.out.println("Recieved picture!");
-					// put image in monitor
-					clientMonitor.putPicture(imageData, ts, camNbr);
+//					System.out.println("Recieved picture!");
+					//put image in monitor
+					clientMonitor.putPicture(new Picture(imageData, ts) ,camNbr);
 
 					// ImageIcon a = new ImageIcon(imageData);
 				}
