@@ -30,7 +30,7 @@ public class ClientMonitor {
 		delayedFrames = 0;
 		this.forceSync = false;
 		setSynced(false);
-		mode = MODE_AUTO;
+		setMode(MODE_AUTO);
 		modeIsSetToAuto = true;
 		modeChanged = false;
 		pic1Available = false;
@@ -49,8 +49,8 @@ public class ClientMonitor {
 			this.mode = mode;
 			modeChanged = true;
 			modeToSend = mode - 1;
-			notifyAll();
 		}
+		notifyAll();
 	}
 
 	public synchronized void setForcedSync(boolean sync) {
@@ -210,6 +210,10 @@ public class ClientMonitor {
 			}
 		return modeToSend;
 
+	}
+	
+	public int getMode(){
+		return mode;
 	}
 
 }

@@ -18,7 +18,8 @@ public class Display extends Thread {
 		while (true) {
 
 			displayMonitor.setSynced(clientMonitor.getSyncMode());
-
+			displayMonitor.setMode(clientMonitor.getMode());
+			
 			Picture pic = clientMonitor.getPicture(camNbr);
 
 			// delay in sync code

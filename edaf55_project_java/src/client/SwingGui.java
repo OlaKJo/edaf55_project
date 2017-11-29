@@ -38,7 +38,8 @@ public class SwingGui extends javax.swing.JFrame {
 	private JLabel syncLabel;
 
 	private boolean newInput;
-	private int mode, syncMode;
+	private int mode;
+	public int syncMode;
 	private GroupLayout layout;
 	private int onlyOnce = 0;
 	
@@ -72,8 +73,8 @@ public class SwingGui extends javax.swing.JFrame {
 	public SwingGui() {
 		initComponents();
 		newInput = false;
-		mode = ClientMonitor.MODE_MOVIE;
-		movieRadioButton.setSelected(true);
+		mode = ClientMonitor.MODE_AUTO;
+		autoRadioButton.setSelected(true);
 	}
 
 	private void initComponents() {
@@ -130,7 +131,7 @@ public class SwingGui extends javax.swing.JFrame {
 			}
 		});
 
-		syncLabel.setText("synchronized");
+		syncLabel.setText("Asynchronous");
 
 		delayLabel2.setText("32 ms");
 
@@ -231,7 +232,7 @@ public class SwingGui extends javax.swing.JFrame {
 				wait();
 			newInput = false;
 
-			return new int[] { mode, syncMode };
+			return new int[] { getMode(), syncMode };
 
 		} catch (InterruptedException e) {
 			return null;
@@ -269,6 +270,18 @@ public class SwingGui extends javax.swing.JFrame {
 		newInput = true;
 		syncMode = syncCheckBox.isSelected() ? MODE_SYNC : MODE_ASYNC;
 		notifyAll();
+	}
+
+	public int getMode() {
+		return mode;
+	}
+
+	public void setDelayLabel1(int delay) {
+		delayLabel1.setText(delay + "");
+	}
+	
+	public void setDelayLabel2(int delay) {
+		delayLabel2.setText(delay + "");
 	}
 	
 //	public static void main (String[] args) {
