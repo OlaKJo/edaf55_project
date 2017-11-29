@@ -9,5 +9,9 @@ public class Picture {
 		this.byteStream = byteStream;
 		this.timeStamp = timeStamp;
 	}
+	
+	public void convertToJavaTime(long baseline) {
+		timeStamp += baseline;
+	}
 
 }

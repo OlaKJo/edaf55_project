@@ -24,6 +24,7 @@ public class ClientMonitor {
 	private Picture lastPic1 = new Picture(null, 0);
 	private Picture lastPic2 = new Picture(null, 0);
 	private LinkedList<Long> syncStamps1, syncStamps2;
+	private long baseline1, baseline2;
 
 	public ClientMonitor() {
 
@@ -67,6 +68,14 @@ public class ClientMonitor {
 	}
 
 	public synchronized void putPicture(Picture pic, int camNumber) {
+		if (baseline1 == 0 && camNumber == 1) {
+			setBaseLine(pic, 1);
+		} else if(baseline2 == 0  && camNumber == 2) {
+			setBaseLine(pic, 2);
+		}
+		
+		pic.convertToJavaTime(camNumber == 1 ? baseline1 : baseline2); 
+		
 		System.out.println("Image put in clientMonitor");
 
 		if (camNumber == 1) {
@@ -83,6 +92,14 @@ public class ClientMonitor {
 				syncReqCheckCam2Add(pic);
 		}
 		notifyAll();
+	}
+
+	private void setBaseLine(Picture pic, int camNbr) {
+		if (camNbr == 1) {
+			baseline1 = System.currentTimeMillis()-pic.timeStamp;
+		} else if (camNbr == 2) {
+			baseline2 = System.currentTimeMillis()-pic.timeStamp;
+		}
 	}
 
 	private void syncReqCheckCam1Add(Picture pic) {
