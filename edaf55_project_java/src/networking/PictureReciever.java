@@ -1,9 +1,11 @@
 package networking;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -44,6 +46,10 @@ public class PictureReciever extends Thread {
 				// Receive data packages of different sizes
 				while (running) {
 
+					for (int i = 0; i < buffer.length; i++) {
+						buffer[i] = 65;
+					}
+
 					// Read header
 					int size = PicturePack.HEAD_SIZE;
 					int n = 0;
@@ -56,34 +62,26 @@ public class PictureReciever extends Thread {
 					long ts = PicturePack.getTimeStamp(buffer);
 					int pictureSize = PicturePack.getPictureSize(buffer);
 					System.out.println("pictureSize: " + pictureSize);
-//					System.out.print("Timestamp: " + ts);
-					
+					// System.out.print("Timestamp: " + ts);
+
 					// Read image data
 					size = pictureSize;
-					n = 0;
-					while ((n = is.read(buffer, n + PicturePack.HEAD_SIZE, size)) > 0) {
-//						System.out.println(size);
+//					n = 0;
+					int currentPosition = PicturePack.HEAD_SIZE;
+					while ((n = is.read(buffer, currentPosition, size)) > 0) {
+						currentPosition += n;
 						size -= n;
+						System.out.println(size);
 					}
+					
+//					Thread.sleep(2000);
+					
 					if (size != 0)
 						break;
 
-					
 					byte[] imageData = new byte[pictureSize];
 					System.arraycopy(buffer, PicturePack.HEAD_SIZE, imageData, 0, pictureSize);
-					
-					BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageData));
-					File outputfile = new File("./testimage.jpg");
-				    ImageIO.write(img, "jpg", outputfile);
-				    
-				    try (FileOutputStream fos = new FileOutputStream("./imagebytes")) {
-				    	   fos.write(imageData);
-				    	   fos.close();
-				    	}
-//					for(int i = 0; i < 500; i++){
-//						System.out.print(Byte.toString(buffer[i]) + " ");
-//					}
-					
+
 //					System.out.println("Recieved picture!");
 					//put image in monitor
 					clientMonitor.putPicture(new Picture(imageData, ts) ,camNbr);
@@ -107,7 +105,7 @@ public class PictureReciever extends Thread {
 				netMonitor.shutdown();
 				break;
 			}
-			
+
 		}
 
 		// No resources to dispose since this is the responsibility
