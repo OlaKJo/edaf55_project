@@ -59,7 +59,7 @@ public class DisplayMonitor {
 	public synchronized void updatePicture2(Picture pic) {
 		this.pic_2 = pic;
 		syncDelayThread(pic);
-		gui.updateImage1(pic_2);
+		gui.updateImage2(pic_2);
 		showedTime = System.currentTimeMillis();
 		lastTimeStamp = pic.timeStamp;
 		

@@ -6,12 +6,12 @@ public class ModeNetStarter {
 	private NetMonitor netMon;
 	private Thread[] threads;
 	
-	public ModeNetStarter(ClientMonitor cMon, String ip, int port) {
+	public ModeNetStarter(ClientMonitor cMon, String ip, int port, int camNbr) {
 
 		netMon = new NetMonitor();
 		threads = new Thread[] {
 			new ModeSender(netMon, cMon),
-			new ClientConnectionThread(netMon, ip, port),
+			new ClientConnectionThread(netMon, ip, port, "ModeSender " + camNbr),
 			new ClientShutdownThread(netMon)
 		};
 	}

@@ -17,7 +17,7 @@ public class PictureNetStarter {
 		netMon = new NetMonitor();
 		threads = new Thread[] {
 			new PictureReciever(netMon, cMon, camNbr),
-			new ClientConnectionThread(netMon, ip, port),
+			new ClientConnectionThread(netMon, ip, port, "PictureReciever " + camNbr),
 			new ClientShutdownThread(netMon)
 		};
 	}
